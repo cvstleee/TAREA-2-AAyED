@@ -5,7 +5,7 @@
 // TDA pila de números enteros
 
 
-//cambio el dato por proceso y tiempo para el ejercicio, esto me hará tener que cambiar la implementación, pero debo esperar que el profe me responda la duda
+//cambio el dato por proceso y tiempo para el ejercicio, esto me hará tener que cambiar la implementación
 typedef struct nodo{
     int proceso;
     int tiempo;
@@ -33,7 +33,7 @@ int es_pila_vacia(pila *p);
 /*------------- Actividad 1 -------------*/
 // apilar(p, d) inserta el dato d al inicio de la pila p 
 // orden de complejidad: O(1)
-void apilar(pila *p, int d);
+void apilar(pila *p, int pro, int tie);
 
 
 // desapilar(p) elimina el primer elemento de la pila p 
@@ -55,7 +55,9 @@ void imprime_pila(pila *p);
 
 
 /*------------- Actividad 3 -------------*/
-int busca_dato_pila(pila *p, int d);
+//int busca_dato_pila(pila *p, int d);
 
 //doc colaborativo profe
-int esPalindroma(pila *A);
+//int esPalindroma(pila *A);
+
+void invertirPila(pila *p);

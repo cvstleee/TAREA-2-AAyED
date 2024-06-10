@@ -21,9 +21,10 @@ int es_pila_vacia(pila *p){
     }
     
     
-void apilar(pila *p, int d){
+void apilar(pila *p, int pro, int tie){
 	nodo* aux=(nodo*)malloc(sizeof(nodo));
-	aux -> dato = d;
+	aux -> proceso = pro;
+	aux -> tiempo = tie;
 	aux -> siguiente = p -> tope;
 	p -> tope = aux;
 	p -> size = p -> size + 1;
@@ -52,23 +53,35 @@ void imprime_pila(pila *p){
 		printf("la pila esta vacia\n");
 	}else{
 		while(!es_pila_vacia(p)){
-		printf("%c ", aux -> dato);
-		apilar(aux_pila, aux -> dato);
+		printf("proceso: %i tiempo: %i", aux -> proceso, aux -> tiempo);
+		apilar(aux_pila, aux -> proceso, aux -> tiempo);
 		desapilar(p);
 		aux = p -> tope;
 	 	}
 	 
 		aux = aux_pila -> tope; 
 		while(!es_pila_vacia(aux_pila)){
-			apilar(p, aux -> dato);
+			apilar(p, aux -> proceso, aux -> tiempo);
 			desapilar(aux_pila);
 			aux = aux_pila -> tope;
 		}
 
 	}
 }
+void invertirPila(pila *p){
+	pila* pilaAuxiliar = nueva_pila();
+    while (!es_pila_vacia(p)) {
+        apilar(pilaAuxiliar, tope(p)->proceso, tope(p)->tiempo);
+		desapilar(p);
+    }
+    while (!es_pila_vacia(pilaAuxiliar)) {
+        apilar(p, tope(pilaAuxiliar)->proceso, tope(pilaAuxiliar)->tiempo);
+		desapilar(pilaAuxiliar);
+    }
+    liberarPila(pilaAuxiliar);
+}
 
-int busca_dato_pila(pila *p, int d){
+/*int busca_dato_pila(pila *p, int d){
 	int dato_encontrado = 0;
 	nodo *aux;
 	pila *aux_pila;
@@ -123,4 +136,4 @@ int esPalindroma(pila *A){
 	//ME FALTA DEJAR LA A CON TODOS SUS DATOS, AL SER ENTREGA CON * SE PIERDEN AL DESAPILAR
 	free(C);
 	return 1;
-}
+}*/
