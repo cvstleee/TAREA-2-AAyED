@@ -6,15 +6,15 @@
 
 
 //cambio el dato por proceso y tiempo para el ejercicio, esto me hará tener que cambiar la implementación
-typedef struct nodo{
+typedef struct nodoPila{
     int proceso;
     int tiempo;
-    struct nodo *siguiente;
-    }nodo;
+    struct nodoPila *siguiente;
+    }nodoPila;
 
 typedef struct{
  	int size;
- 	nodo *tope;
+ 	nodoPila *tope;
     }pila;
 
 
@@ -43,7 +43,7 @@ void desapilar(pila *p);
 
 // tope(p) retorna la dirección del primer elemento de la lista p
 // orden de complejidad: O(1)
-nodo* tope(pila *p);
+nodoPila* tope(pila *p);
 
 
 
@@ -60,4 +60,4 @@ void imprime_pila(pila *p);
 //doc colaborativo profe
 //int esPalindroma(pila *A);
 
-void invertirPila(pila *p);
+pila * invertirPila(pila *p);

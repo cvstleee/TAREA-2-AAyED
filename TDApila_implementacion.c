@@ -22,7 +22,7 @@ int es_pila_vacia(pila *p){
     
     
 void apilar(pila *p, int pro, int tie){
-	nodo* aux=(nodo*)malloc(sizeof(nodo));
+	nodoPila* aux=(nodoPila*)malloc(sizeof(nodoPila));
 	aux -> proceso = pro;
 	aux -> tiempo = tie;
 	aux -> siguiente = p -> tope;
@@ -30,12 +30,12 @@ void apilar(pila *p, int pro, int tie){
 	p -> size = p -> size + 1;
 }
 
-nodo *tope(pila *p){
+nodoPila *tope(pila *p){
 	return p -> tope;
 }
 
 void desapilar(pila *p){
-	nodo* aux=(nodo*)malloc(sizeof(nodo));
+	nodoPila* aux=(nodoPila*)malloc(sizeof(nodoPila));
 	aux = p -> tope;
 	p -> tope = p -> tope -> siguiente;
 	p -> size = p -> size - 1;
@@ -46,14 +46,14 @@ void desapilar(pila *p){
 void imprime_pila(pila *p){
 	pila *aux_pila;
 	aux_pila = nueva_pila();
-	nodo* aux;
+	nodoPila* aux;
 	aux = p -> tope;
 	
 	if(es_pila_vacia(p)){
 		printf("la pila esta vacia\n");
 	}else{
 		while(!es_pila_vacia(p)){
-		printf("proceso: %i tiempo: %i", aux -> proceso, aux -> tiempo);
+		printf("proceso: %i tiempo: %i\n", aux -> proceso, aux -> tiempo);
 		apilar(aux_pila, aux -> proceso, aux -> tiempo);
 		desapilar(p);
 		aux = p -> tope;
@@ -68,17 +68,17 @@ void imprime_pila(pila *p){
 
 	}
 }
-void invertirPila(pila *p){
+pila * invertirPila(pila *p){
 	pila* pilaAuxiliar = nueva_pila();
     while (!es_pila_vacia(p)) {
         apilar(pilaAuxiliar, tope(p)->proceso, tope(p)->tiempo);
 		desapilar(p);
     }
-    while (!es_pila_vacia(pilaAuxiliar)) {
+    /*while (!es_pila_vacia(pilaAuxiliar)) {
         apilar(p, tope(pilaAuxiliar)->proceso, tope(pilaAuxiliar)->tiempo);
 		desapilar(pilaAuxiliar);
-    }
-    liberarPila(pilaAuxiliar);
+    }*/
+    return(pilaAuxiliar);
 }
 
 /*int busca_dato_pila(pila *p, int d){

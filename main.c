@@ -4,9 +4,6 @@
 //#include "TDAlista.h"
 #include "TDApila.h"
 
-
-
-
 int main(int argc, char *argv[]){
     int cantidadCargas, cantidadProcesos;
     int procesoCarga, tiempoProcesoCarga; //para la pila
@@ -47,34 +44,58 @@ int main(int argc, char *argv[]){
 
     //me almacena el valor de la primera linea de enteros (carga 1), pero como lo hago con las demás cargas?
     int num1, num2;
+    int result1, result2;
     int count = 0;
-    for(int i = 0; i < cantidadCargas; i++){
-        while (fscanf(archivo, "%d", &num1) == 1) {
-            count++;
-            if (fscanf(archivo, "%d", &num2) == 1) {
-                printf("n° proceso: %d, tiempo: %d\n", num1, num2);
-                count++;
-            } else {
-                printf("Solo 1 numero, pero este no deberia pasar Num1: %d, Num2: None\n", num1);
-            }
+    int j = 0;
+
+    char buffer[100]; // Buffer para leer líneas completas
+
+    // Leer y procesar los datos del archivo línea por línea
+    while (fgets(buffer, sizeof(buffer), archivo) != NULL) {
+        char *linea = buffer;
+        int offset = 0;
+        int result;
+
+        // Leer y procesar los pares de enteros en la línea
+        for (int z = 0; z < cantidadProcesos; z++) {
+            fscanf(archivo,"%d %d", &num1, &num2);
+            printf("Proceso: %d, Tiempo: %d\n", num1, num2);
+            //imprime_pila(pilasCargas[j]);
+           // printf("\nva apilando en %i a %i %i \n", j, num1,num2);
+            apilar(pilasCargas[j], num1, num2);
+            linea += offset; // Avanzar en la línea
         }
-        // y al terminar debería apilar y limpiarlos, para que pase al siguiente, pero como lo hago?
+        j = (j + 1) % cantidadCargas; // Cambiar a la siguiente pila después de procesar una línea
     }
 
+    //---PILAS INVERTIDAS, PARA PODER TENER EL PRIMER PROCESO EN EL TOPE DE CADA UNA
 
+    // Inicializar cada pila auxiliar para invertirlas
+     pila** pilasCargasAux = (pila**)malloc(cantidadCargas * sizeof(pila*));
+    for (int i = 0; i < cantidadCargas; i++) {
+        pilasCargasAux[i] = nueva_pila();
+    }
 
-    /*
-    for(int i = 0; i < cantidadProcesos; i++){
-        fscanf(archivo, "%d %d")
-        apilar(pilasCargas[0], )
-    }*/
+   for(j = 0; j < cantidadCargas; j++){
+        printf("\nPila carga %i: ", j + 1);
+        imprime_pila(pilasCargas[j]);
+
+        printf("PILA INVERTIDA %i\n", j + 1);
+        pilasCargasAux[j] = invertirPila(pilasCargas[j]);
+        imprime_pila(pilasCargasAux[j]);
+    }
 
     // Cerrar el archivo
     fclose(archivo);
 
     // Imprimir los valores almacenados
-    printf("Cantidad cargas: %d\n", cantidadCargas);
+    printf("\nCantidad cargas: %d\n", cantidadCargas);
     printf("Cantidad procesos: %d\n", cantidadProcesos);
+     // Liberar memoria de las pilas
+    for (int i = 0; i < cantidadCargas; i++) {
+        free(pilasCargas[i]);
+        free(pilasCargasAux[i]);
+    }
 
 
     return 0;
