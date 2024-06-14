@@ -21,27 +21,29 @@ int es_lista_vacia(lista *l){
     }
 
 
-void inserta_inicio(lista *l, int d){
+void inserta_inicio(lista *l, int ca, int pro){
     nodo *nuevo_nodo = (nodo*)malloc(sizeof(nodo));
-    nuevo_nodo->dato = d;
+    nuevo_nodo->carga = ca;
+    nuevo_nodo->proceso = pro;
     nuevo_nodo->siguiente = l->inicio;
     l->inicio = nuevo_nodo;
   }
 
 
-void inserta_final(lista *l, int d){
+void inserta_final(lista *l, int ca, int pro){
   nodo *final = l -> inicio;
   while(final -> siguiente != NULL){
     final = final -> siguiente;
   }
   nodo *nuevo_nodo = (nodo*)malloc(sizeof(nodo));
-  nuevo_nodo -> dato = d;
+  nuevo_nodo->carga = ca;
+  nuevo_nodo->proceso = pro;
   nuevo_nodo -> siguiente = NULL;
   final -> siguiente = nuevo_nodo;
 }
 
 
-void inserta_despues(lista *l, int valor, int datoAnterior){
+/*void inserta_despues(lista *l, int valor, int datoAnterior){
   nodo *anterior = l -> inicio;
   while(anterior -> dato != datoAnterior){
     anterior = anterior -> siguiente;
@@ -50,7 +52,7 @@ void inserta_despues(lista *l, int valor, int datoAnterior){
   nuevo_nodo ->dato = valor;
   nuevo_nodo -> siguiente = anterior -> siguiente;
   anterior ->siguiente = nuevo_nodo;
-}
+}*/
 
 
 
@@ -76,7 +78,7 @@ void elimina_final(lista* l){
   free(final);
 }
 
-void eliminarDato(lista* l, int dato){
+/*void eliminarDato(lista* l, int dato){
   nodo* indicado = l -> inicio;
   nodo* anteriorIndicado = NULL;
   if (!es_lista_vacia(l)){
@@ -85,14 +87,14 @@ void eliminarDato(lista* l, int dato){
       indicado = indicado -> siguiente;
     }  
   }  anteriorIndicado -> siguiente = indicado -> siguiente;
-}
+}*/
 
 void imprime_lista(lista *l){
-    printf("Lista: ");
+    printf("Lista topes a comparar: ");
     if (!es_lista_vacia(l)){
         nodo *aux = l->inicio;
         while (aux != NULL){
-            printf("%i ", aux->dato);
+            printf("proceso: %i carga: %i", aux->proceso, aux->carga);
             aux = aux->siguiente;
             }
         printf("\n");
@@ -125,7 +127,7 @@ int cuenta_nodos(lista *l){
   }
 }
 
-int busca_dato(lista *l, int d){
+/*int busca_dato(lista *l, int d){
 	nodo *auxiliar = l->inicio;
 	while (auxiliar != NULL){
     	if(auxiliar->dato == d){
@@ -145,9 +147,9 @@ lista* lista_inversa(lista* l){
   }
   inserta_inicio(aux_invertido, aux->dato);
   return aux_invertido;
-}
+}*/
 
-void numMenor_numMayor(lista *l, int x, lista *lista_menor, lista *lista_mayor){
+/*void numMenor_numMayor(lista *l, int x, lista *lista_menor, lista *lista_mayor){
 	int j = 0;
 	int dato_x = 0;
 	nodo *auxiliar = l -> inicio;
@@ -170,7 +172,7 @@ void numMenor_numMayor(lista *l, int x, lista *lista_menor, lista *lista_mayor){
 		auxiliar = auxiliar -> siguiente;
 	}
 	
-}
+}*/
 
 
 nodo* obtenerNodo(lista *l, int posicion){
@@ -186,7 +188,7 @@ nodo* obtenerNodo(lista *l, int posicion){
 
 
 
-lista *eliminarParentesis(lista *A){
+/*lista *eliminarParentesis(lista *A){
   lista *lista_aux = nueva_lista();
   nodo *aux = A ->inicio;
 
@@ -273,4 +275,4 @@ lista *mezclarListasOrdenadas(lista *A, lista *B){
   }
 
   return C;
-}
+}*/
