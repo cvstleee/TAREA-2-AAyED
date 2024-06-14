@@ -1,14 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "TDAlista.h"
+//#include "TDAlista.h"
 
 /*------------- estructura de datos -------------*/
 // TDA cola de números enteros
 
+typedef struct nodoCola{
+    int dato;
+    struct nodoCola *siguiente;
+    }nodoCola;
+
+
+/*typedef struct{
+    nodoCola *inicio;
+    }lista;
+*/
+
 typedef struct{
 	int size;
-	nodo *n_frente;
-	nodo *n_final;
+	nodoCola *n_frente;
+	nodoCola *n_final;
 	}cola;
 
 
@@ -32,7 +43,7 @@ void descolar(cola *c);
 
 
 // Devuelve un puntero al primer nodo de la cola c.
-nodo* frente(cola *c);
+nodoCola* frente(cola *c);
 
 
 // Libera la memoria la memoria del acola c.

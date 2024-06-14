@@ -5,37 +5,84 @@
 #include "TDApila.h"
 
 
-int procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantidadCargas){
+//debe devolver el optimo (tiempo)
+void procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantidadCargas){
     int tiempoUsado = 0;
     lista *topes = nueva_lista();
 
     //---TENDRIA QUE METER TODO ESTO EN UN BUCLE DESPUÉS, PARA QUE LO HAGA CON TODOS LOS TOPES
     //1. comparar topes, guardarlos en una lista enlazada
     //en la lista guardo el proceso y la carga?, es que con la carga sabría cual encolar después
+
+    //COMO ACTUALIZO ESTE TOPE???
     for(int i = 0; i < cantidadCargas; i++){
+        //guarda, carga 3, carga 2 y carga 1 (en este orden)
         inserta_inicio(topes, i + 1 , tope(pilasCargas[i])->proceso);
     }
 
     //comparar procesos, caso = queda una en espera, caso != se procesan al mismo tiempo
     nodo *aux = topes->inicio;
-    nodo *siguiente = aux -> siguiente;
+    nodo *sig = aux -> siguiente;
     //int iguales = 0;
     int cargaIgual= 0;
-    while(siguiente != NULL){
-        if(aux ->proceso == siguiente->proceso){
-          //  iguales = 1;
-          //este aux va a tener el valor de una de las cargas que tiene el este igual y va a ser la que no se va a encolar! para así
-          //dejarla en espera y encolarla en el segundo turno
-            cargaIgual = aux ->carga;
+    while (aux != NULL) {
+        sig = aux->siguiente;
+        while (sig != NULL) {
+            if (aux ->proceso == sig->proceso) {
+                //FUNCIONA BIEN ESTO, aux tiene a la carga 2 y sig a la carga 1
+               printf("carga %i tiene el mismo proceso que la carga %i\n", aux->carga, sig->carga);
+               //pero y si hay más de dos cargas con el proceso igual?
+               cargaIgual = aux->carga; //me guarda el carga 2 
+            }
+            sig = sig->siguiente;
         }
-        //punteros avanzan
-        aux = aux ->siguiente;
-        siguiente = siguiente ->siguiente;
+        aux = aux->siguiente;
     }
+     printf("carga guardada para procesar despues: %i\n", cargaIgual);
+    //aqui se procesarian las cargas != a carga igual
+    int cargaActual = 0;
+    int procesoActual = 0;
+    int tiempoInvertido = 0;
+    aux=topes->inicio;
+    while(aux != NULL){
+        //primero sería 3 y después 1
+        cargaActual = aux -> carga;
+        if(cargaActual != cargaIgual){
+            //extraer que proceso tiene esa carga en los topes y llamar al arreglo de colas
+            procesoActual = aux -> proceso;
+            //encola en la cola del proceso 2, el tiempo que está en el tope de la carga 3
+            printf("se está procesando la carga %i en el proceso %i\n", cargaActual, procesoActual);
+            encolar(colasProcesos[procesoActual], cargaActual);
+            printf("carga encolada %i en procesoCola %i\n", colasProcesos[procesoActual]->n_frente->dato, procesoActual);
+            //aumentamos el tiempo optimo
 
+            //es - 1 pq justamente las puse en la lista con + 1
+            //printf("tope tiempo %i\n", tope(pilasCargas[cargaActual - 1])->tiempo);
 
+            //y si no tengo que comparar el tiempoInvertido?, sino el tiempo de las cargas que se procesan?
+            if (tiempoInvertido != tope(pilasCargas[cargaActual - 1])->tiempo){
+                if(tiempoInvertido < tope(pilasCargas[cargaActual - 1])->tiempo){
+                    //duda con este, me da el 3, pero dudo
+                    //DE MOMENTO FUNCIONA BIEN
+                    tiempoInvertido = tiempoInvertido + tope(pilasCargas[cargaActual - 1])->tiempo;
+                    //desapila la carga que ya se procesó
+                    desapilar(pilasCargas[cargaActual]);
+                }
+            }
+            //tiempoInvertido = tiempoInvertido + tope(pilasCargas[cargaActual - 1])->tiempo;
+            printf("el tiempo que se lleva es %i\n",tiempoInvertido);
+        }
+        aux = aux->siguiente;
+    }
+    //debe dar 6, pero realmente es 3, tengo que arreglarlo
+    printf("el tiempo que se lleva es %i\n",tiempoInvertido);
+
+    //si carga igual es != a 0 significa que hay una carga en espera para cierto proceso
+
+    /*if(cargaIgual != 0){
+
+    }*/
 }
-
 
 
 
@@ -119,6 +166,8 @@ int main(int argc, char *argv[]){
         pilasCargasAux[j] = invertirPila(pilasCargas[j]);
         imprime_pila(pilasCargasAux[j]);
     }
+
+    procesamientoCargas(pilasCargasAux, colasProcesos, cantidadCargas);
 
     // Cerrar el archivo
     fclose(archivo);

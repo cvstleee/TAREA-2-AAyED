@@ -4,8 +4,8 @@
 
 
 
-nodo* crea_nodo(int dato){
-	nodo *nuevo_nodo = (nodo*)malloc(sizeof(nodo));
+nodoCola* crea_nodo(int dato){
+	nodoCola *nuevo_nodo = (nodoCola*)malloc(sizeof(nodoCola));
 	nuevo_nodo->dato = dato;
 	nuevo_nodo->siguiente = NULL;
 	return nuevo_nodo;
@@ -29,7 +29,7 @@ int es_cola_vacia(cola *c){
 
 
 void encolar(cola* c, int dato){
-    nodo *nuevo_nodo = crea_nodo(dato);
+    nodoCola *nuevo_nodo = crea_nodo(dato);
     if(c->size == 0){
         c->n_frente = nuevo_nodo;
         c->n_final = nuevo_nodo;
@@ -52,7 +52,7 @@ void descolar(cola *c){
 		}
     else 
 		if(c->size > 1){
-			nodo *aux_nodo = c->n_frente;
+			nodoCola *aux_nodo = c->n_frente;
 			c->n_frente = c->n_frente->siguiente;
 			free(aux_nodo);
 			c->size = c->size-1;
@@ -60,7 +60,7 @@ void descolar(cola *c){
 	}
 
 
-nodo* frente(cola *c){
+nodoCola* frente(cola *c){
     return c->n_frente;
     }
 
