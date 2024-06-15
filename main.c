@@ -4,6 +4,24 @@
 #include "TDAlista.h"
 #include "TDApila.h"
 
+// Función para llenar la lista con los topes de las pilas
+void llenarTopes(pila **pilasCargas, lista *topes, int cantidadCargas) {
+    // Vaciar la lista de topes actual
+    while (topes->inicio != NULL) {
+        elimina_inicio(topes);
+    }
+    
+    // Llenar la lista con los nuevos topes de las pilas
+    for (int i = 0; i < cantidadCargas; i++) {
+        inserta_inicio(topes, i + 1, tope(pilasCargas[i])->proceso);
+    }
+}
+
+
+void procesamientoCargasCiclo(pila ** pilasCargas, cola ** colasProcesos, int cantidadCargas){
+    //aqui va el ciclo que ve cuales se guardan y bla
+}
+
 
 //debe devolver el optimo (tiempo)
 void procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantidadCargas){
@@ -15,10 +33,12 @@ void procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantida
     //en la lista guardo el proceso y la carga?, es que con la carga sabría cual encolar después
 
     //COMO ACTUALIZO ESTE TOPE???
-    for(int i = 0; i < cantidadCargas; i++){
+
+    llenarTopes(pilasCargas, topes, cantidadCargas);
+   /* for(int i = 0; i < cantidadCargas; i++){
         //guarda, carga 3, carga 2 y carga 1 (en este orden)
         inserta_inicio(topes, i + 1 , tope(pilasCargas[i])->proceso);
-    }
+    }*/
 
     //comparar procesos, caso = queda una en espera, caso != se procesan al mismo tiempo
     nodo *aux = topes->inicio;
@@ -49,7 +69,7 @@ void procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantida
         cargaActual = aux -> carga;
         if(cargaActual != cargaIgual){
             //extraer que proceso tiene esa carga en los topes y llamar al arreglo de colas
-            procesoActual = aux -> proceso;
+            procesoActual = aux -> proceso - 1;
             //encola en la cola del proceso 2, el tiempo que está en el tope de la carga 3
             printf("se está procesando la carga %i en el proceso %i\n", cargaActual, procesoActual);
             encolar(colasProcesos[procesoActual], cargaActual);
@@ -60,13 +80,16 @@ void procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantida
             //printf("tope tiempo %i\n", tope(pilasCargas[cargaActual - 1])->tiempo);
 
             //y si no tengo que comparar el tiempoInvertido?, sino el tiempo de las cargas que se procesan?
+            //pero y si el tiempo invertido es = al tiempo que se quiere agregar? error!!
+            //hay que comparar los tiempos que se van a agregar, tendré que hacer otra lista???
             if (tiempoInvertido != tope(pilasCargas[cargaActual - 1])->tiempo){
                 if(tiempoInvertido < tope(pilasCargas[cargaActual - 1])->tiempo){
                     //duda con este, me da el 3, pero dudo
                     //DE MOMENTO FUNCIONA BIEN
                     tiempoInvertido = tiempoInvertido + tope(pilasCargas[cargaActual - 1])->tiempo;
-                    //desapila la carga que ya se procesó
-                    desapilar(pilasCargas[cargaActual]);
+                    //printf("el tiempo que se lleva es %i\n",tiempoInvertido);
+                    //desapila la carga que ya se procesó, x alguna razón se me cae aqui el código
+                    desapilar(pilasCargas[cargaActual - 1]);
                 }
             }
             //tiempoInvertido = tiempoInvertido + tope(pilasCargas[cargaActual - 1])->tiempo;
@@ -79,9 +102,45 @@ void procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantida
 
     //si carga igual es != a 0 significa que hay una carga en espera para cierto proceso
 
-    /*if(cargaIgual != 0){
+    llenarTopes(pilasCargas, topes, cantidadCargas);
+    int i;
+    if(cargaIgual != 0){
+       //se hace el ciclo distinto, ya que se prioriza el procesamiento de esta carga para desapilarla dsp
+       //1. revisar lista topes nuevos y procesar los que son != al que tiene la cargaIgual
+       //comparar procesos, caso = queda una en espera, caso != se procesan al mismo tiempo
 
-    }*/
+        nodo *aux = topes->inicio;
+        //nodo *sig = aux -> siguiente;
+        //int iguales = 0;
+        //int cargaIgual= 0;
+        while (aux != NULL) {
+            //sig = aux->siguiente;
+                //si el proceso de x carga es != al proceso de la carga que quedó en espera, procesarlas
+                if (aux ->proceso != tope(pilasCargas[cargaIgual])->proceso) {
+                    encolar(colasProcesos[tope(pilasCargas[cargaIgual])->proceso - 1], aux->carga);
+                    desapilar(pilasCargas[aux -> carga - 1]);
+                //pero y si hay más de dos cargas con el proceso igual?
+                //cargaIgual = aux->carga; //me guarda el carga 2 
+                }
+    
+            //pero y si el tiempo invertido es = al tiempo que se quiere agregar? error!!
+            //LO QUE HAY QUE COMPARAR SON LOS TIEMPOS QUE SE VAN A AGREGAR, NO EL TIEMPO INVERTIDO CON LOS OTROS!!
+            if (tiempoInvertido != tope(pilasCargas[cargaActual - 1])->tiempo){
+                if(tiempoInvertido < tope(pilasCargas[cargaActual - 1])->tiempo){
+                                //duda con este, me da el 3, pero dudo
+                                //DE MOMENTO FUNCIONA BIEN
+                    tiempoInvertido = tiempoInvertido + tope(pilasCargas[cargaActual - 1])->tiempo;
+                                //printf("el tiempo que se lleva es %i\n",tiempoInvertido);
+                                //desapila la carga que ya se procesó, x alguna razón se me cae aqui el código
+                    //desapilar(pilasCargas[cargaActual - 1]);
+                }
+            }
+
+        aux = aux->siguiente;
+        }
+        //printf("el tiempo 2 que se lleva es %i\n",tiempoInvertido);
+    }
+
 }
 
 
