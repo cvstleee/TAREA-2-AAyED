@@ -10,36 +10,14 @@ void llenarTopes(pila **pilasCargas, lista *topes, int cantidadCargas) {
     while (topes->inicio != NULL) {
         elimina_inicio(topes);
     }
-    
     // Llenar la lista con los nuevos topes de las pilas
     for (int i = 0; i < cantidadCargas; i++) {
         inserta_inicio(topes, i + 1, tope(pilasCargas[i])->proceso);
     }
 }
 
-
-void procesamientoCargasCiclo(pila ** pilasCargas, cola ** colasProcesos, int cantidadCargas){
-    //aqui va el ciclo que ve cuales se guardan y bla
-}
-
-
-//debe devolver el optimo (tiempo)
-void procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantidadCargas){
-    int tiempoUsado = 0;
-    lista *topes = nueva_lista();
-
-    //---TENDRIA QUE METER TODO ESTO EN UN BUCLE DESPUÉS, PARA QUE LO HAGA CON TODOS LOS TOPES
-    //1. comparar topes, guardarlos en una lista enlazada
-    //en la lista guardo el proceso y la carga?, es que con la carga sabría cual encolar después
-
-    //COMO ACTUALIZO ESTE TOPE???
-
-    llenarTopes(pilasCargas, topes, cantidadCargas);
-   /* for(int i = 0; i < cantidadCargas; i++){
-        //guarda, carga 3, carga 2 y carga 1 (en este orden)
-        inserta_inicio(topes, i + 1 , tope(pilasCargas[i])->proceso);
-    }*/
-
+//devuelve el número de la carga que queda en espera
+int verificarProcesoRepetido(lista *topes, int cantidadCargas){
     //comparar procesos, caso = queda una en espera, caso != se procesan al mismo tiempo
     nodo *aux = topes->inicio;
     nodo *sig = aux -> siguiente;
@@ -58,12 +36,33 @@ void procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantida
         }
         aux = aux->siguiente;
     }
-     printf("carga guardada para procesar despues: %i\n", cargaIgual);
+    return cargaIgual;
+}
+
+
+void procesamientoCargasCiclo(pila ** pilasCargas, cola ** colasProcesos, int cantidadCargas){
+    //aqui va el ciclo que ve cuales se guardan y bla
+}
+
+
+//debe devolver el optimo (tiempo)
+void procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantidadCargas){
+    int tiempoUsado = 0;
+    lista *topes = nueva_lista();
+
+    llenarTopes(pilasCargas, topes, cantidadCargas);
+
+    //comparar procesos, caso = queda una en espera, caso != se procesan al mismo tiempo
+    //se mantiene en 0 en caso de no haber ==
+    int cargaEspera = 0;
+    cargaEspera = verificarProcesoRepetido(topes, cantidadCargas); //funciona
+
+    printf("carga guardada para procesar despues: %i\n", cargaEspera);
     //aqui se procesarian las cargas != a carga igual
     int cargaActual = 0;
     int procesoActual = 0;
     int tiempoInvertido = 0;
-    aux=topes->inicio;
+    /*aux=topes->inicio;
     while(aux != NULL){
         //primero sería 3 y después 1
         cargaActual = aux -> carga;
@@ -96,7 +95,7 @@ void procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantida
             printf("el tiempo que se lleva es %i\n",tiempoInvertido);
         }
         aux = aux->siguiente;
-    }
+    }*/
     //debe dar 6, pero realmente es 3, tengo que arreglarlo
     printf("el tiempo que se lleva es %i\n",tiempoInvertido);
 
@@ -104,7 +103,7 @@ void procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantida
 
     llenarTopes(pilasCargas, topes, cantidadCargas);
     int i;
-    if(cargaIgual != 0){
+    /*if(cargaIgual != 0){
        //se hace el ciclo distinto, ya que se prioriza el procesamiento de esta carga para desapilarla dsp
        //1. revisar lista topes nuevos y procesar los que son != al que tiene la cargaIgual
        //comparar procesos, caso = queda una en espera, caso != se procesan al mismo tiempo
@@ -139,7 +138,7 @@ void procesamientoCargas(pila ** pilasCargas, cola ** colasProcesos, int cantida
         aux = aux->siguiente;
         }
         //printf("el tiempo 2 que se lleva es %i\n",tiempoInvertido);
-    }
+    }*/
 
 }
 
