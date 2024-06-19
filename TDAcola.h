@@ -4,7 +4,7 @@
 
 /*------------- estructura de datos -------------*/
 // TDA cola de números enteros
-
+//dato sería el número de la carga
 typedef struct nodoCola{
     int dato;
     struct nodoCola *siguiente;
@@ -48,3 +48,5 @@ nodoCola* frente(cola *c);
 
 // Libera la memoria la memoria del acola c.
 void liberar_cola(cola *c);
+
+void imprime_cola(cola *c);

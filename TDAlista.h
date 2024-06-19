@@ -4,6 +4,8 @@
 /*------------- estructura de datos -------------*/
 // TDA lista de números enteros
 
+//modificar para hacer una lista de pilas
+
 typedef struct nodo{
     int carga;
     int proceso;

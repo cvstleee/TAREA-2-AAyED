@@ -70,4 +70,28 @@ void liberar_cola(cola *c){
 		descolar(c);
         }
 	free(c);
+}
+
+void imprime_cola(cola *c) {
+	cola *aux = crea_cola_vacia();
+    if (c->n_frente == NULL) {
+        printf("La cola está vacía.\n");
+        return;
     }
+    nodoCola *temp = c->n_frente;
+
+    while (temp != NULL) {
+        printf("%d ", temp->dato);
+        encolar(aux, temp->dato);
+		descolar(c);
+		temp = c->n_frente;
+    }
+    printf("\n");
+	temp = aux->n_frente;
+	while(temp != NULL){
+		encolar(c, temp->dato);
+		descolar(aux);
+		temp = aux->n_frente;
+	}
+	free(aux);
+}
