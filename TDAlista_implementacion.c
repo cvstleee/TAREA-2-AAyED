@@ -78,17 +78,6 @@ void elimina_final(lista* l){
   free(final);
 }
 
-/*void eliminarDato(lista* l, int dato){
-  nodo* indicado = l -> inicio;
-  nodo* anteriorIndicado = NULL;
-  if (!es_lista_vacia(l)){
-    while (indicado -> dato != dato){
-      anteriorIndicado = indicado;
-      indicado = indicado -> siguiente;
-    }  
-  }  anteriorIndicado -> siguiente = indicado -> siguiente;
-}*/
-
 void imprime_lista(lista *l){
     printf("Lista topes a comparar: ");
     if (!es_lista_vacia(l)){
