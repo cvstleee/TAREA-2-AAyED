@@ -10,15 +10,22 @@
 
 // Función para llenar la lista con los topes de las pilas
 //TDA usado: lista simple
-void llenarTopes(pila **pilasCargas, lista *topes, int cantidadCargas) {
+void llenarTopes(listaPila *pilasCargas, lista *topes, int cantidadCargas) {
+    nodoListaPila *aux = pilasCargas->inicio;
+    pila *pilaAux;;
     // Vaciar la lista de topes actual
     while (topes->inicio != NULL) {
         elimina_inicio(topes);
     }
     // Llenar la lista con los nuevos topes de las pilas
     for (int i = 0; i < cantidadCargas; i++) {
-        inserta_inicio(topes, i + 1, tope(pilasCargas[i])->proceso);
+        //tope me guarda n° de carga y su respectivo proceso
+        pilaAux = aux->pilaDatos;
+        inserta_inicio(topes, i + 1, tope(pilaAux)->proceso);
+        aux = aux -> siguiente;
     }
+    //printf("LISTA TOPES INICIALES (dentro funcion)\n");
+    //imprime_lista(topes);
 }
 
 //Función que verifica si hay procesos repetidos, con que uno se repita, queda uno en espera y ese entrega, en caso de no
@@ -56,101 +63,104 @@ int verificarProcesoRepetido(lista *topes, int cantidadCargas){
 //aqui hay que cambiar arreglo a listaPila y listaCola
 
 //esta función hay que llamarla según cuantas cargas hayan (en el main) hasta que queden vacías
-int procesarCargas(listaPila * pilasCargas, listaCola * colasProcesos, int cantidadCargas, int cantidadProcesos, 
-int tiempoAcumulado, int cargaEspera){
+
+//y si hago una función que actue primero con las !=  y en el 2do ciclo vea si hay una repetida
+//la lógica está bien sí
+int procesarCargasDistintas(listaPila *pilasCargas, listaCola *colasProcesos, int cantidadProcesos, int tiempoAcumulado) {
     int i, j;
     pila *pilaAux = nueva_pila();
-    //cola *colaAux = crea_cola_vacia();
-    nodoListaPila *auxCargas = pilasCargas ->inicio;
-    nodoListaCola *auxProcesos = colasProcesos ->inicio;
+    nodoListaPila *auxCargas = pilasCargas->inicio;
+    nodoListaCola *auxProcesos;
     int cargaActual = 0;
     int procesoActual = 0;
-    int procesoRealizado = 0;
-    int tiempoParcial = 0; //aqui se comparan los tiempos de las cargas que se procesan a la vez en procesos !=
-    //caso todos los procesos !=, procesarlos todos 
-    //i == posicion en listaPila
-    if(cargaEspera == 0){
-        //pq hay que encolarlos todos
-        while(auxCargas != NULL){
-                pilaAux = auxCargas -> pilaDatos;
-                procesoActual = tope(pilaAux) -> proceso;
-                cargaActual = cargaActual + 1;
-                //el proceso se entrega partiendo de 1
-                //se reinicia cada que entra al ciclo de buscar proceso
-                auxProcesos = colasProcesos->inicio;
-                for(i = 1; i <= cantidadProcesos; i++){
-                    if(i == procesoActual){
-                        encolar(auxProcesos -> colaProceso, cargaActual);
-                        //tiempoParcial = tope(pilaAux)->tiempo;
-                        desapilar(auxCargas -> pilaDatos);
-                    }
-                    //avanza en la lista de procesos
-                    auxProcesos = auxProcesos -> siguiente;
-                }
-                    //tiempo parcial siempre será el mayor de los obtenidos en esa ronda
-                    if(tiempoParcial < tope(pilaAux)->tiempo){
-                            tiempoParcial = tope(pilaAux)->tiempo;
-                    }
-            auxCargas = auxCargas ->siguiente;
-        } 
-    }//si hay carga en espera, es pq hay iguales, aqui hay que controlar que solo se procesen las distintas
-    if(cargaEspera != 0){
-        //se procesa la carga que quedó en espera primero pq es prioridad
-        //ciclo para llegar a la carga que se va a encolar
-        //auxCargas = pilasCargas -> inicio;
-        for(i = 1; i <= cantidadCargas; i++){
-            if(i == cargaEspera){  
-                pilaAux = auxCargas -> pilaDatos;
-                //procesoActual = tope(pilaAux) -> proceso;
-                procesoRealizado = tope(pilaAux) -> proceso;
-                auxProcesos = colasProcesos ->inicio;
-                //busca en la lista con las colas de procesos
-                for(j = 1; j <= cantidadProcesos; j++){
-                    if(j == procesoRealizado){
-                        encolar(auxProcesos -> colaProceso, cargaEspera);
-                        tiempoParcial = tope(pilaAux)->tiempo;
-                        desapilar(auxCargas -> pilaDatos);
-                    }
-                    //avanza en la lista de procesos
-                    auxProcesos = auxProcesos -> siguiente;
-                }
+    int tiempoParcial = 0;
+
+    while (auxCargas != NULL) {
+        pilaAux = auxCargas->pilaDatos;
+        procesoActual = tope(pilaAux)->proceso;
+        cargaActual++;
+
+        auxProcesos = colasProcesos->inicio;
+        for (i = 1; i <= cantidadProcesos; i++) {
+            if (i == procesoActual) {
+                encolar(auxProcesos->colaProceso, cargaActual);
+                desapilar(auxCargas->pilaDatos);
             }
-            auxCargas = auxCargas -> siguiente;
+            auxProcesos = auxProcesos->siguiente;
         }
 
-        //procesar las cargas con proceso distinto al de la cargaEspera
-        auxCargas = pilasCargas -> inicio;
-        pila *topeAux;
-        for(i = 1; i <= cantidadCargas; i++){
-            //si no es la misma carga ya procesada y a la vez el proceso es != al ya procesado en la de espera
-            auxProcesos = colasProcesos -> inicio;
-            //va cambiando el topeAux cada que avanza rl for
-            topeAux = auxCargas -> pilaDatos;
-            if((i != cargaEspera) && (tope(topeAux) -> proceso != procesoRealizado)){
-                procesoActual = tope(topeAux)->proceso;
-                cargaActual = i + 1;
-                for(j = 1; j <= cantidadProcesos; j++){
-                    if(j == procesoActual){
-                        encolar(auxProcesos -> colaProceso, cargaActual);
-                        //tiempoParcial = tope(pilaAux)->tiempo;
-                        desapilar(auxCargas -> pilaDatos);
-                        //tiempo parcial siempre será el mayor de los obtenidos en esa ronda
-                        if(tiempoParcial < tope(topeAux)->tiempo){
-                                tiempoParcial = tope(topeAux)->tiempo;
-                        }
-                    }
-                    auxProcesos = auxProcesos -> siguiente;
-                }
-            }
-            auxCargas = auxCargas -> siguiente;
+        if (auxCargas->pilaDatos != NULL && tiempoParcial < tope(auxCargas->pilaDatos)->tiempo) {
+            tiempoParcial = tope(auxCargas->pilaDatos)->tiempo;
         }
+
+        auxCargas = auxCargas->siguiente;
     }
-            
-    tiempoAcumulado = tiempoAcumulado + tiempoParcial;
 
+    tiempoAcumulado += tiempoParcial;
     return tiempoAcumulado;
 }
 
+int procesarCargaEnEspera(listaPila *pilasCargas, listaCola *colasProcesos, int cantidadCargas, int cantidadProcesos, int tiempoAcumulado, int cargaEspera) {
+    int i, j;
+    pila *pilaAux;
+    nodoListaPila *auxCargas = pilasCargas->inicio;
+    nodoListaCola *auxProcesos;
+    int procesoRealizado = 0;
+    int tiempoParcial = 0;
+
+    for (i = 1; i <= cantidadCargas; i++) {
+        if (i == cargaEspera) {
+            pilaAux = auxCargas->pilaDatos;
+            procesoRealizado = tope(pilaAux)->proceso;
+
+            auxProcesos = colasProcesos->inicio;
+            for (j = 1; j <= cantidadProcesos; j++) {
+                if (j == procesoRealizado) {
+                    encolar(auxProcesos->colaProceso, cargaEspera);
+                    tiempoParcial = tope(pilaAux)->tiempo;
+                    desapilar(auxCargas->pilaDatos);
+                }
+                auxProcesos = auxProcesos->siguiente;
+            }
+        }
+        auxCargas = auxCargas->siguiente;
+    }
+
+    auxCargas = pilasCargas->inicio;
+    for (i = 1; i <= cantidadCargas; i++) {
+        auxProcesos = colasProcesos->inicio;
+        pila *topeAux = auxCargas->pilaDatos;
+
+        if ((i != cargaEspera) && (tope(topeAux)->proceso != procesoRealizado)) {
+            int procesoActual = tope(topeAux)->proceso;
+            int cargaActual = i + 1;
+
+            for (j = 1; j <= cantidadProcesos; j++) {
+                if (j == procesoActual) {
+                    encolar(auxProcesos->colaProceso, cargaActual);
+                    desapilar(auxCargas->pilaDatos);
+
+                    if (tope(topeAux) != NULL && tiempoParcial < tope(topeAux)->tiempo) {
+                        tiempoParcial = tope(topeAux)->tiempo;
+                    }
+                }
+                auxProcesos = auxProcesos->siguiente;
+            }
+        }
+        auxCargas = auxCargas->siguiente;
+    }
+
+    tiempoAcumulado += tiempoParcial;
+    return tiempoAcumulado;
+}
+
+ int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos, int cantidadCargas, int cantidadProcesos, int tiempoAcumulado, int cargaEspera) {
+    if (cargaEspera == 0) {
+        return procesarCargasDistintas(pilasCargas, colasProcesos, cantidadProcesos, tiempoAcumulado);
+    } else {
+        return procesarCargaEnEspera(pilasCargas, colasProcesos, cantidadCargas, cantidadProcesos, tiempoAcumulado, cargaEspera);
+    }
+}
 
 
 int main(int argc, char *argv[]){
@@ -195,13 +205,13 @@ int main(int argc, char *argv[]){
 
         // Leer y procesar los pares de enteros en la línea
         for (z = 0; z < cantidadProcesos; z++) {
-            printf("z: %i\n", z); //z está avanzando bien
+            //printf("z: %i\n", z); //z está avanzando bien
             fscanf(archivo,"%d %d", &num1, &num2);
-            printf("Proceso: %d, Tiempo: %d\n", num1, num2);
+            //printf("Proceso: %d, Tiempo: %d\n", num1, num2);
             apilar(pilaAux, num1, num2);
-            printf("apilado %i %i\n", num1, num2);
-            printf("ASI VA LA PILA\n");
-            imprime_pila(pilaAux);
+            //printf("apilado %i %i\n", num1, num2);
+            //printf("ASI VA LA PILA\n");
+            //imprime_pila(pilaAux);
             linea += offset; // Avanzar en la línea
         }
         pilaAuxInv = invertirPila(pilaAux);
@@ -214,6 +224,28 @@ int main(int argc, char *argv[]){
 
     
     //---PROCESAMIENTO DE CARGAS DESPUÉS DE SACAR INFO DEL ARCHIVO
+    //PASO 1: extraer topes
+    lista *listaTopes = nueva_lista();
+    llenarTopes(pilasCargas, listaTopes, cantidadCargas);
+    printf("LISTA TOPES INICIALES\n");
+    imprime_lista(listaTopes);
+
+    int pruebaCarga;
+
+    pruebaCarga = verificarProcesoRepetido(listaTopes, cantidadCargas);
+
+    printf("la carga que se repite es %i\n", pruebaCarga);
+
+    //parte para revisar si procesa bien los procesos !=
+
+    //prueba sin cargas en espera
+    //debe darme 12 KLDHSFJ
+    int tiempo = 0;
+    tiempo = procesarCargas(pilasCargas, colasProcesos, cantidadCargas, cantidadProcesos, 0, 0);
+
+    printf("TIEMPO AAA: %i\n", tiempo);
+
+
     //Ahora como voy modificando los topes, eso debería terminar cuando todas las cargas estén vacías...
 
    // procesamientoCargas(pilasCargasAux, colasProcesos, cantidadCargas);
@@ -222,8 +254,8 @@ int main(int argc, char *argv[]){
     fclose(archivo);
 
     // Imprimir los valores almacenados
-    printf("\nCantidad cargas: %d\n", cantidadCargas);
-    printf("Cantidad procesos: %d\n", cantidadProcesos);
+    //printf("\nCantidad cargas: %d\n", cantidadCargas);
+    //printf("Cantidad procesos: %d\n", cantidadProcesos);
     
 
 

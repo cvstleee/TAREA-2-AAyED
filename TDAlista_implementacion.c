@@ -79,11 +79,11 @@ void elimina_final(lista* l){
 }
 
 void imprime_lista(lista *l){
-    printf("Lista topes a comparar: ");
+    printf("Lista topes a comparar: \n");
     if (!es_lista_vacia(l)){
         nodo *aux = l->inicio;
         while (aux != NULL){
-            printf("proceso: %i carga: %i", aux->proceso, aux->carga);
+            printf("proceso: %i carga: %i\n", aux->proceso, aux->carga);
             aux = aux->siguiente;
             }
         printf("\n");
