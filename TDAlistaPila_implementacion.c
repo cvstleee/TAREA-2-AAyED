@@ -57,7 +57,7 @@ void imprime_listaPila(listaPila *l){
     if (!es_listaPila_vacia(l)){
         nodoListaPila *aux = l->inicio;
         while (aux != NULL){
-            printf("posicion: %i datos pila: \n", aux->posicion);
+            printf("carga: %i datos pila: \n", aux->posicion);
             imprime_pila(aux->pilaDatos);
             aux = aux->siguiente;
             }

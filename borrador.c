@@ -54,6 +54,8 @@ int verificarProcesoRepetido(lista *topes, int cantidadCargas){
 //tiempo acumulado en la primera llamada es 0
 
 //aqui hay que cambiar arreglo a listaPila y listaCola
+
+//esta función hay que llamarla según cuantas cargas hayan (en el main) hasta que queden vacías
 int procesarCargas(listaPila * pilasCargas, listaCola * colasProcesos, int cantidadCargas, int cantidadProcesos, 
 int tiempoAcumulado, int cargaEspera){
     int i, j;
@@ -156,6 +158,8 @@ int main(int argc, char *argv[]){
     int procesoCarga, tiempoProcesoCarga; //para la pila
     listaCola *colasProcesos = nueva_listaCola();
     listaPila *pilasCargas = nueva_listaPila();
+    pila *pilaAux = nueva_pila();
+    int i;
 
     FILE *archivo;
     // Abrir el archivo
@@ -167,29 +171,7 @@ int main(int argc, char *argv[]){
     //leer cantidad de cargas y procesos
     fscanf(archivo, "%d %d", &cantidadCargas, &cantidadProcesos);
 
-
-    //---CREACIÓN COLAS PROCESOS---
-    // Crear un arreglo de punteros a Cola
-    //cola** colasProcesos = (cola**)malloc(cantidadProcesos * sizeof(cola*));
-    
-    // Inicializar cada cola, se manipulan dsp
-    /*for (int i = 0; i < cantidadProcesos; i++) {
-        colasProcesos[i] = crea_cola_vacia();
-        printf("cola %i\n", i);
-    }*/
-
-    //---CREACIÓN PILAS DE CARGAS---
-    // Crear un arreglo de punteros a Pila
-    //pila** pilasCargas = (pila**)malloc(cantidadCargas * sizeof(pila*));
-    
-    // Inicializar cada pila
-    /*for (int i = 0; i < cantidadCargas; i++) {
-        pilasCargas[i] = nueva_pila();
-    }*/
-
-    //guardar sus respectivos datos, n°proceso + tiempo en realizarlo, hay que invertirlas!!
-
-    //me almacena el valor de la primera linea de enteros (carga 1), pero como lo hago con las demás cargas?
+    //leer procesos y tiempos según cargas y las guarda en pilas
     int num1, num2;
     int result1, result2;
     int count = 0;
@@ -197,62 +179,40 @@ int main(int argc, char *argv[]){
 
     char buffer[100]; // Buffer para leer líneas completas
     nodoListaPila *aux = pilasCargas ->inicio;
-    // Leer y procesar los datos del archivo línea por línea
+    int z;
+    int carga = 1;
 
-    //SOLO ME HACE EL PRIMER PAR AAAAAAAAAAAAAAA
+    //hay que invertir las pilas
     while (fgets(buffer, sizeof(buffer), archivo) != NULL) {
         char *linea = buffer;
         int offset = 0;
         int result;
-        imprime_listaPila(pilasCargas);
+        //imprime_listaPila(pilasCargas);
 
         //crea pilas según cantidad de procesos, se crea fuera, ya que se necesitan nuevas dsp de completar el for
         pila *pilaAux = nueva_pila();
+        pila *pilaAuxInv = nueva_pila();
 
         // Leer y procesar los pares de enteros en la línea
-        for (int z = 0; z < cantidadProcesos; z++) {
-            printf("z: %i\n", z);
+        for (z = 0; z < cantidadProcesos; z++) {
+            printf("z: %i\n", z); //z está avanzando bien
             fscanf(archivo,"%d %d", &num1, &num2);
             printf("Proceso: %d, Tiempo: %d\n", num1, num2);
-            //imprime_pila(pilasCargas[j]);
-           // printf("\nva apilando en %i a %i %i \n", j, num1,num2);
             apilar(pilaAux, num1, num2);
             printf("apilado %i %i\n", num1, num2);
+            printf("ASI VA LA PILA\n");
             imprime_pila(pilaAux);
-            insertarPila(pilasCargas, z, pilaAux);
-            imprime_listaPila(pilasCargas);
-
-            //apilar(pilasCargas[j], num1, num2);
             linea += offset; // Avanzar en la línea
         }
-       // j = (j + 1) % cantidadCargas; // Cambiar a la siguiente pila después de procesar una línea
-        aux = aux ->siguiente;
+        pilaAuxInv = invertirPila(pilaAux);
+        insertarPila(pilasCargas, carga, pilaAuxInv);
+        carga++;
     }
 
-    //--PRUEBA GUARDADO DE CARGAS EN LA LISTA DE PILAS
-
-    //nodoListaPila *aux = pilasCargas->inicio;
-    //ojo, no imprime esto
     printf("LISTA CON PILAS RESULTANTE:\n");
     imprime_listaPila(pilasCargas);
 
-    //---PILAS INVERTIDAS, PARA PODER TENER EL PRIMER PROCESO EN EL TOPE DE CADA UNA
-
-    // Inicializar cada pila auxiliar para invertirlas
-     /*pila** pilasCargasAux = (pila**)malloc(cantidadCargas * sizeof(pila*));
-    for (int i = 0; i < cantidadCargas; i++) {
-        pilasCargasAux[i] = nueva_pila();
-    }
-
-   for(j = 0; j < cantidadCargas; j++){
-        printf("\nPila carga %i: ", j + 1);
-        imprime_pila(pilasCargas[j]);
-
-        printf("PILA INVERTIDA %i\n", j + 1);
-        pilasCargasAux[j] = invertirPila(pilasCargas[j]);
-        imprime_pila(pilasCargasAux[j]);
-    }*/
-
+    
     //---PROCESAMIENTO DE CARGAS DESPUÉS DE SACAR INFO DEL ARCHIVO
     //Ahora como voy modificando los topes, eso debería terminar cuando todas las cargas estén vacías...
 
