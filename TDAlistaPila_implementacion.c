@@ -83,3 +83,36 @@ void elimina_inicioListaPila(listaPila *l){
         free(aux);
         }
     }
+
+// Función para eliminar un nodo con una posición específica de la lista de pilas
+void eliminarNodoListaPila(listaPila* lista, int posicion) {
+    nodoListaPila* temp = lista->inicio;
+    nodoListaPila* prev = NULL;
+
+    // Caso en el que el nodo a eliminar es el nodo inicio
+    if (temp != NULL && temp->posicion == posicion) {
+        lista->inicio = temp->siguiente;
+        free(temp->pilaDatos); // Suponemos que también hay que liberar la pila
+        free(temp);
+        return;
+    }
+
+    // Buscar el nodo a eliminar y mantener el nodo previo
+    while (temp != NULL && temp->posicion != posicion) {
+        prev = temp;
+        temp = temp->siguiente;
+    }
+
+    // Si la posición no se encuentra en la lista
+    if (temp == NULL) {
+        printf("Posición no encontrada en la lista\n");
+        return;
+    }
+
+    // Desconectar el nodo a eliminar de la lista enlazada
+    prev->siguiente = temp->siguiente;
+
+    // Liberar memoria del nodo eliminado
+    free(temp->pilaDatos); // Suponemos que también hay que liberar la pila
+    free(temp);
+}

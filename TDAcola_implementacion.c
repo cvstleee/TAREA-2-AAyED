@@ -75,7 +75,7 @@ void liberar_cola(cola *c){
 void imprime_cola(cola *c) {
 	cola *aux = crea_cola_vacia();
     if (c->n_frente == NULL) {
-        printf("La cola está vacía.\n");
+        printf("La cola esta vacia.\n");
         return;
     }
     nodoCola *temp = c->n_frente;

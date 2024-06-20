@@ -52,7 +52,7 @@ void libera_listaCola(listaCola *l){
 	}
 
 void insertarCola(listaCola *l, int numProceso, cola *c) {
-    printf("se esta insertando la cola \n");
+    //printf("se esta insertando la cola \n");
     imprime_cola(c); //me esta dando 27 3 ?
     nodoListaCola *nuevoNodo = (nodoListaCola*)malloc(sizeof(nodoListaCola));
     nuevoNodo->numeroProceso = numProceso;

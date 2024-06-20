@@ -27,12 +27,15 @@ void llenarTopes(listaPila *pilasCargas, lista *topes, int cantidadCargas) {
 }
 
 //Función que verifica si hay procesos repetidos, con que uno se repita, queda uno en espera y ese entrega, en caso de no
-//existir, devuelve un 0
+//existir, devuelve una lista nula
 //se usa TDA lista simple
-int verificarProcesoRepetido(lista *topes, int cantidadCargas){
+//devuelve una lista con la carga y el proceso a realizar después del primer desapilado
+lista * verificarProcesoRepetido(lista *topes, int cantidadCargas){
     nodo *aux = topes->inicio;
     nodo *sig = aux -> siguiente;
-    int cargaIgual= 0;
+    //int cargaIgual= 0;
+
+    lista *auxLista = nueva_lista();
     //se recorre la lista de topes
     while (aux != NULL) {
         sig = aux->siguiente;
@@ -40,7 +43,7 @@ int verificarProcesoRepetido(lista *topes, int cantidadCargas){
             if (aux ->proceso == sig->proceso) {
                 //FUNCIONA BIEN ESTO, aux tiene a la carga 2 y sig a la carga 1
                printf("carga %i tiene el mismo proceso que la carga %i\n", aux->carga, sig->carga);
-               cargaIgual = aux->carga; //me guarda el carga 2 
+               inserta_inicio(auxLista,aux->carga, aux->proceso); //me guarda el carga 2 
             }
             //que avance para terminar el ciclo
             sig = sig->siguiente;
@@ -48,5 +51,5 @@ int verificarProcesoRepetido(lista *topes, int cantidadCargas){
         //que avance para terminar el ciclo de los topes
         aux = aux->siguiente;
     }
-    return cargaIgual;
+    return auxLista;
 }

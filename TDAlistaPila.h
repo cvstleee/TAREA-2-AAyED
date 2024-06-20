@@ -32,3 +32,5 @@ void imprime_listaPila(listaPila *l);
 void libera_listaPila(listaPila *l);
 
 void elimina_inicioListaPila(listaPila *l);
+
+void eliminarNodoListaPila(listaPila* lista, int posicion);
