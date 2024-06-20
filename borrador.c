@@ -82,52 +82,139 @@ int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos){
     nodo *auxEspera;
     //mientras queden procesos por realizar
     while(!es_listaPila_vacia(pilasCargas)){
+        //se me va a bucle después del primer ciclo
         printf("TIEMPO PARCIAL INICIAL %i\n", tiempoParcial);
         //se recorre la lista de pilas, ciclo que hace el procesamiento por topes
         //lista para controlar que no se hagan procesos repetidos en el mismo ciclo
+
+        //LO ESTOY REINICIANDO MAL EN EL CASO DE 1 CARGA EN ESPERA Y CARGAS DISTINTAS PROCESADAS AL MISMO TIEMPO
         lista *procesosRealizados = nueva_lista();
         nodo *auxRealizados;
 
         //revisar carga en espera
         //Si hay una carga en espera, se procesa la en espera como prioridad y las distintas a ella
+        //NO ENTRA A ACÁ
         if(!es_lista_vacia(cargaEspera)){
-            printf("TIEMPO PARCIAL SEGUNDO %i\n", tiempoParcial);
+            //en el segundo ciclo entra a acá
+            printf("SEGUNDO CICLO\n");
             //buscar la carga en la lista de pilas
             auxListaCargas = pilasCargas->inicio;
             auxEspera = cargaEspera->inicio;
             while(auxListaCargas != NULL){
-                if(auxListaCargas->posicion == auxEspera->proceso){
+                if(auxListaCargas->posicion == auxEspera->carga){
+
                     pilaActual = auxListaCargas->pilaDatos;
-                    //se procesa la primera carga, ya que de momento su proceso no se repite con ninguna
+                    printf("PILA EN ESPERA\n");
+                    imprime_pila(pilaActual);
+                    //FUNCIONA BIEN HASTA ACÁ
+
+                    //se procesa la carga en espera
                     procesoActual = tope(pilaActual)->proceso;
                     //deberia ser lo mismo de auxEspera
                     cargaActual = auxListaCargas->posicion;
+
                     //guarda solo el tiempo mayor de la ronda actual
                     if(tiempoParcial < tope(pilaActual)->tiempo){
                         tiempoParcial = tope(pilaActual)->tiempo;
                     }
-                    printf("TIEMPO PARCIAL 1 %i\n", tiempoParcial);
+                    
+                    printf("TIEMPO PARCIAL 2 %i\n", tiempoParcial);
+
+                    //FUNCIONA HASTA ACÁ
+
                     //ahora posicionarnos en el procesoActual de la lista
+                    auxListaProcesos = colasProcesos->inicio;
                     while(auxListaProcesos!= NULL){
                         if(auxListaProcesos->numeroProceso == procesoActual){
                             encolar(auxListaProcesos->colaProceso,cargaActual);
                             desapilar(auxListaCargas->pilaDatos);
+                            printf("PILA 2 DESPUES DE DESAPILAR\n");
+                            imprime_pila(auxListaCargas->pilaDatos);
                             //se guarda el ya procesado para no repetirlo
                             inserta_inicio(procesosRealizados, cargaActual, procesoActual);
+                            //deberia estar solo el 1 1
+                            //printf("deberia dar 1 2\n");
+                            //imprime_lista(procesosRealizados);
+
                             if(es_pila_vacia(auxListaCargas->pilaDatos)){
                                 //eliminarla de la lista
+                                printf("NO DEBERIA ESTAR ACA 2819\n");
                                 eliminarNodoListaPila(pilasCargas, auxListaCargas->posicion);
                             }
                         }
+                        //FUNCIONA BIEN HASTA ACÁ
                         auxListaProcesos = auxListaProcesos ->siguiente;
                     }
+                    //auxListaCargas = auxListaCargas->siguiente;
                 }
+                //avanza hasta el nulo, pq este ciclo es solo para buscar la carga en espera
             auxListaCargas = auxListaCargas->siguiente;
             }
             //vacia el cargaEspera
             elimina_inicio(cargaEspera);
+
+            //Y SI AQUI MISMO VEO LAS CARGAS !=? no se me ocurre otra cosa tbh
+            //NO FUNCIONA ESTO
+            /*auxListaCargas = pilasCargas->inicio;
+            while(auxListaCargas != NULL){
+                pilaActual = auxListaCargas->pilaDatos;
+                procesoActual = tope(pilaActual)->proceso;
+                cargaActual = auxListaCargas->posicion;
+
+                //buscar si no fueron procesadas en este ciclo
+                auxRealizados = procesosRealizados->inicio;
+                while(auxRealizados != NULL){
+                    if(procesoActual == auxRealizados->proceso){
+                        //que avance en la lista
+                        auxListaCargas = auxListaCargas->siguiente;
+                    }
+                    if(cargaActual == auxRealizados->carga);
+                        auxListaCargas = auxListaCargas->siguiente;
+                }
+                //se quedará apuntando a la carga que no tenga un proceso ya realizado o que la carga en si no haya sido procesada
+                pilaActual = auxListaCargas->pilaDatos;
+                procesoActual = tope(pilaActual)->proceso;
+                cargaActual = auxListaCargas->posicion;
+                //guarda solo el tiempo mayor de la ronda actual
+                if(tiempoParcial < tope(pilaActual)->tiempo){
+                    tiempoParcial = tope(pilaActual)->tiempo;
+                }
+
+                auxListaProcesos = colasProcesos->inicio;
+                while(auxListaProcesos!= NULL){
+                    if(auxListaProcesos->numeroProceso == procesoActual){
+                        encolar(auxListaProcesos->colaProceso,cargaActual);
+                        printf("ENCOLO LA CARGA %i\n", cargaActual);
+                        printf("EN EL PROCESO %i\n",auxListaProcesos->numeroProceso);
+                        desapilar(auxListaCargas->pilaDatos);
+                        printf("PILA DESPUES DE DESAPILAR LO ANTERIOR\n");
+                        imprime_pila(auxListaCargas->pilaDatos);
+
+
+                        //se guarda el ya procesado para no repetirlo
+                        inserta_inicio(procesosRealizados, cargaActual, procesoActual);
+                        printf("PROCESO YA REALIZADO GUARDADO\n");
+                        imprime_lista(procesosRealizados);
+                        //FUNCIONA BIEN HASTA ACÁ CON LA PRIMERA CARGA
+                        if(es_pila_vacia(auxListaCargas->pilaDatos)){
+                            printf("NO DEBERIA ENTRAR ACA\n");
+                                //eliminarla de la lista
+                                eliminarNodoListaPila(pilasCargas, auxListaCargas->posicion);
+                            }
+                    }
+                    //AVANZA
+                    auxListaProcesos = auxListaProcesos ->siguiente;
+                }
+                //se avanza en la lista de pilas después de haber encolado alguna carga
+                auxListaCargas = auxListaCargas->siguiente;
+            }*/
+
+
         }else{
             //de aqui hacia abajo funciona bien
+
+            //ciclo 2, se reinicia, ya que se encoló la carga en espera
+            auxListaCargas = pilasCargas->inicio;
             printf("TIEMPO PARCIAL TERCERO %i\n", tiempoParcial);
 
             //sin carga en espera
@@ -163,7 +250,6 @@ int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos){
                         printf("PROCESO YA REALIZADO GUARDADO\n");
                         imprime_lista(procesosRealizados);
                         //FUNCIONA BIEN HASTA ACÁ CON LA PRIMERA CARGA
-
                         if(es_pila_vacia(auxListaCargas->pilaDatos)){
                             printf("NO DEBERIA ENTRAR ACA\n");
                                 //eliminarla de la lista
@@ -173,58 +259,106 @@ int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos){
                     //AVANZA
                     auxListaProcesos = auxListaProcesos ->siguiente;
                 }
+
+
+                //FALLA ACÁ HACIA ABAJO EN EL CASO DE QUE SE REALIZA CARGA EN ESPERA + 1 DISTINTA, VUELVE A LA QUE ERA CARGA EN ESPERA
                 //se avanza en la lista de pilas después de haber encolado alguna carga
+                //el error debe ser pq no controlo que no exista la carga que se está viendo en la lista de procesados
+                
+                
                 auxListaCargas = auxListaCargas->siguiente;
                 printf("AQUI DEBERIA APUNTAR A LA CARGA 2\n");
                 imprime_pila(auxListaCargas->pilaDatos);
-                //FUNCIONA HASTA ACÁ
-                
+
+
                 pilaActual = auxListaCargas->pilaDatos;
                 //ahora hay que ver si el que sigue es repetido, revisando la lista de procesados en el ciclo anterior
+                //SOLO VEO REPETIDOS EN ESTE CICLO
                 auxRealizados = procesosRealizados->inicio;
                 while(auxRealizados != NULL){
                     //si hay un proceso repetido, se deja en espera para el proximo ciclo
-                    if(tope(pilaActual)->proceso == auxRealizados->proceso){
-                        if(cargaEspera == NULL){
+                    if(tope(pilaActual)->proceso == auxRealizados->proceso || auxListaCargas->posicion == auxRealizados->carga){
+                        printf("CARGA 2 TIENE PROCESO YA REALIZADO, entra a aca \n");
+                        //FUNCIONA HASTA ACÁ
+                        if(es_lista_vacia(cargaEspera)){
                             //insertar en la lista de carga espera, la carga y su proceso en espera
+                            printf("PRIMER REPETIDO, SE GUARDA\n");
+                            //FUNCIONA HASTA ACÁ
                             inserta_inicio(cargaEspera, auxListaCargas->posicion, tope(pilaActual)->proceso);
+                            printf("CARGA Y PROCESO EN ESPERA\n");
+                            imprime_lista(cargaEspera);
                             auxListaCargas = auxListaCargas->siguiente;
+                            printf("ahora apunta a la carga 3\n");
+                            imprime_pila(auxListaCargas->pilaDatos);
+                            printf("\n");
+                            //FUNCIONA HASTA ACÁ
                         }else{
+                            //si no está vacía la carga en espera
                             //no se deja en espera, pero se avanza
                             auxListaCargas = auxListaCargas->siguiente;
+                            //printf("NO DEBERIA ESTAR ACA\n");
                         }
-                    }else{
-                        //caso proceso != y no se encuentra en los ya procesados, se realiza el mismo ciclo de arriba
-                        //pero sin el while, ya que se avanzó antes
-                                pilaActual = auxListaCargas->pilaDatos;
-                                //se procesa la primera carga, ya que de momento su proceso no se repite con ninguna
-                                procesoActual = tope(pilaActual)->proceso;
-                                cargaActual = auxListaCargas->posicion;
-                                //guarda solo el tiempo mayor de la ronda actual
-                                if(tiempoParcial < tope(pilaActual)->tiempo){
-                                    tiempoParcial = tope(pilaActual)->tiempo;
-                                }
-                                //ahora posicionarnos en el procesoActual de la lista
-                                while(auxListaProcesos!= NULL){
-                                    if(auxListaProcesos->numeroProceso == procesoActual){
-                                        encolar(auxListaProcesos->colaProceso,cargaActual);
-                                        desapilar(auxListaCargas->pilaDatos);
-                                        //se guarda el ya procesado para no repetirlo
-                                        inserta_inicio(procesosRealizados, cargaActual, procesoActual);
-                                        if(es_pila_vacia(auxListaCargas->pilaDatos)){
-                                            //eliminarla de la lista
-                                            eliminarNodoListaPila(pilasCargas, auxListaCargas->posicion);
-                                        }
-                                    }
-                                    auxListaProcesos = auxListaProcesos ->siguiente;
-                                }
-                        }
+                    }
+                    auxRealizados = auxRealizados->siguiente;
                 }
+
+                //avanza, no es repetido, que hace?
+                //se procesan los distintos que queden
+                pilaActual = auxListaCargas ->pilaDatos;
+                //printf("PILA 3\n");
+                //imprime_pila(pilaActual);
+                //se procesa la tercera carga, ya que se repitió el proceso de la 2da
+                procesoActual = tope(pilaActual)->proceso;
+                cargaActual = auxListaCargas->posicion;
+                //guarda solo el tiempo mayor de la ronda actual
+                if(tiempoParcial < tope(pilaActual)->tiempo){
+                    tiempoParcial = tope(pilaActual)->tiempo;
+                }
+             
+                printf("TIEMPO PARCIAL 1RA Y 3RA CARGA, DEBE DAR 3: %i\n", tiempoParcial);
+
+                //FUNCIONA HASTA ACÁ
+
+                //ahora posicionarnos en el procesoActual de la lista
+                auxListaProcesos = colasProcesos->inicio;
+                while(auxListaProcesos!= NULL){
+                    if(auxListaProcesos->numeroProceso == procesoActual){
+                        encolar(auxListaProcesos->colaProceso,cargaActual);
+                        printf("ENCOLO LA CARGA %i\n", cargaActual);
+                        printf("EN EL PROCESO %i\n",auxListaProcesos->numeroProceso);
+                        desapilar(auxListaCargas->pilaDatos);
+                        printf("PILA DESPUES DE DESAPILAR LO ANTERIOR\n");
+                        imprime_pila(auxListaCargas->pilaDatos);
+
+                        //FUNCIONA BIEN HASTA ACÁ CON EL PRIMER CICLO, CARGA 3
+
+                        //se guarda el ya procesado para no repetirlo
+                        inserta_inicio(procesosRealizados, cargaActual, procesoActual);
+                        printf("PROCESO YA REALIZADO GUARDADO\n");
+                        imprime_lista(procesosRealizados);
+                        //FUNCIONA BIEN HASTA ACÁ CON LA PRIMERA CARGA
+
+                        if(es_pila_vacia(auxListaCargas->pilaDatos)){
+                            printf("NO DEBERIA ENTRAR ACA\n");
+                                //eliminarla de la lista
+                                eliminarNodoListaPila(pilasCargas, auxListaCargas->posicion);
+                            }
+                    }
+                    //AVANZA
+                    auxListaProcesos = auxListaProcesos ->siguiente;
+
+                }
+                auxListaCargas = auxListaCargas->siguiente;
+                //ESTO FUNCIONA BIEN
+               // printf("PROCESOS CON CARGAS DEL PRIMER CICLO\n");
+                //imprime_listaCola(colasProcesos);
             }
         }
+
         printf("TIEMPO PARCIAL %i\n", tiempoParcial);
         //se termina el primer ciclo, vuelve a arriba, pero ahora tenemos una carga en espera
         tiempoFinal = tiempoFinal + tiempoParcial;
+        tiempoParcial = 0;
     }
     return tiempoFinal;
 }
