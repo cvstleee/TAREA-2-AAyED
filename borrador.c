@@ -34,7 +34,6 @@ void procesarCargaEspecifica(nodoListaPila *auxListaCargas, listaCola *colasProc
     }
 }
 
-
 void procesarCargasEnEspera(listaPila *pilasCargas, listaCola *colasProcesos, lista *cargaEspera, int *tiempoParcial, lista *procesosRealizados) {
     nodo *auxEspera = cargaEspera->inicio;
     while (auxEspera != NULL) {
@@ -52,16 +51,17 @@ void procesarCargasEnEspera(listaPila *pilasCargas, listaCola *colasProcesos, li
 }
 
 int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos) {
+    int i = 1;
     int tiempoParcial = 0;
     int tiempoFinal = 0;
     lista *cargaEspera = nueva_lista();
     
     while (!es_listaPila_vacia(pilasCargas)) {
-        printf("TIEMPO PARCIAL INICIAL %i\n", tiempoParcial);
+       // printf("TIEMPO PARCIAL INICIAL %i\n", tiempoParcial);
         lista *procesosRealizados = nueva_lista();
 
         if (!es_lista_vacia(cargaEspera)) {
-            printf("SEGUNDO CICLO\n");
+         //   printf("SEGUNDO CICLO\n");
             procesarCargasEnEspera(pilasCargas, colasProcesos, cargaEspera, &tiempoParcial, procesosRealizados);
         }
 
@@ -91,11 +91,21 @@ int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos) {
             }
 
         }
-
+        printf("TOPE %i\n ", i);
+        i++;
+        printf("ASI VAN QUEDANDO PILAS\n");
+        imprime_listaPila(pilasCargas);
+        printf("\n");
+        printf("TIEMPO PARCIAL ANTES DE GUARDARSE EN EL FINAL %i\n", tiempoParcial);
         tiempoFinal += tiempoParcial;
+        printf("TIEMPO FINAL NUEVO %i\n", tiempoFinal);
         tiempoParcial = 0;
     }
-    
+    //tengo orden, pero no mismo tiempo
+    //POSIBLE ERROR ENCONTRADO: en el último tope, pasa que se puede procesar la carga 1 y después la carga 3 (3+1)
+    //al mismo tiempo que la carga 2 en el proceso 4 por el tiempo (4)
+    //y esto no lo implementé en ningún lado
+    //si el tiempo de procesamiento de la carga != es > a la suma del procesamiento de las cargas ==, se pueden procesar 2 cargas en un mismo proceso
     return tiempoFinal;
 }
 
@@ -166,8 +176,6 @@ int main(int argc, char *argv[]){
         cola *colaAux = crea_cola_vacia();
         insertarCola(colasProcesos, i+1, colaAux);
     }
-    //printf("LISTA COLA INICIALIZADA CON SOLO POSICIONES, COLAS VACIAS\n");
-    //imprime_listaCola(colasProcesos);
 
     int tiempo = 0;
     tiempo = procesarCargas(pilasCargas, colasProcesos);
