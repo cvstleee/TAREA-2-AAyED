@@ -269,6 +269,10 @@ int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos){
                 auxListaCargas = auxListaCargas->siguiente;
                 printf("AQUI DEBERIA APUNTAR A LA CARGA 2\n");
                 imprime_pila(auxListaCargas->pilaDatos);
+                printf("POSICION %i\n", auxListaCargas->posicion); 
+
+                //aunque tenga la posición, como reinicio mal el yaprocesados, no ve que la carga ya procesada
+                //en la cargaEspera ya se hizo, solo ve que se hizo la carga 1 en el 2do ciclo
 
 
                 pilaActual = auxListaCargas->pilaDatos;
