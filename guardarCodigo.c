@@ -34,7 +34,6 @@ void procesarCargaEspecifica(nodoListaPila *auxListaCargas, listaCola *colasProc
     }
 }
 
-
 void procesarCargasEnEspera(listaPila *pilasCargas, listaCola *colasProcesos, lista *cargaEspera, int *tiempoParcial, lista *procesosRealizados) {
     nodo *auxEspera = cargaEspera->inicio;
     while (auxEspera != NULL) {
@@ -102,6 +101,10 @@ int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos) {
         printf("TIEMPO FINAL NUEVO %i\n", tiempoFinal);
         tiempoParcial = 0;
     }
-    
+    //tengo orden, pero no mismo tiempo
+    //POSIBLE ERROR ENCONTRADO: en el último tope, pasa que se puede procesar la carga 1 y después la carga 3 (3+1)
+    //al mismo tiempo que la carga 2 en el proceso 4 por el tiempo (4)
+    //y esto no lo implementé en ningún lado
+    //si el tiempo de procesamiento de la carga != es > a la suma del procesamiento de las cargas ==, se pueden procesar 2 cargas en un mismo proceso
     return tiempoFinal;
 }

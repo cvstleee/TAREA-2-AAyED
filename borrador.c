@@ -3,6 +3,7 @@
 #include "TDAlista.h"
 #include "TDAlistaPila.h"
 #include "TDAlistaCola.h"
+#include "time.h"
 
 
 //---FUNCIONES PARA PROCESAR CARGAS---
@@ -12,8 +13,6 @@ void procesarCargaEspecifica(nodoListaPila *auxListaCargas, listaCola *colasProc
     int procesoActual = tope(pilaActual)->proceso;
     int cargaActual = auxListaCargas->posicion;
 
-    //si el tiempo de la carga procesada es mayor al tiempo parcial, se actualiza en la misma variable
-    //porque en cada "ciclo" se debe guardar en el final el mayor de todas las cargas procesadas
     if (*tiempoParcial < tope(pilaActual)->tiempo) {
         *tiempoParcial = tope(pilaActual)->tiempo;
     }
@@ -27,7 +26,7 @@ void procesarCargaEspecifica(nodoListaPila *auxListaCargas, listaCola *colasProc
 
             if (es_pila_vacia(auxListaCargas->pilaDatos)) {
                 eliminarNodoListaPila(pilasCargas, auxListaCargas->posicion);
-                auxListaCargas = NULL; // Marcar como NULL para indicar eliminación
+                auxListaCargas = NULL;
             }
         }
         auxListaProcesos = auxListaProcesos->siguiente;
@@ -41,7 +40,6 @@ void procesarCargasEnEspera(listaPila *pilasCargas, listaCola *colasProcesos, li
         while (auxListaCargas != NULL) {
             if (auxListaCargas->posicion == auxEspera->carga) {
                 procesarCargaEspecifica(auxListaCargas, colasProcesos, tiempoParcial, procesosRealizados, pilasCargas);
-                //auxListaCargas = auxListaCargas->siguiente;
             }
             auxListaCargas = auxListaCargas->siguiente;
         }
@@ -55,13 +53,11 @@ int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos) {
     int tiempoParcial = 0;
     int tiempoFinal = 0;
     lista *cargaEspera = nueva_lista();
-    
+
     while (!es_listaPila_vacia(pilasCargas)) {
-       // printf("TIEMPO PARCIAL INICIAL %i\n", tiempoParcial);
         lista *procesosRealizados = nueva_lista();
 
         if (!es_lista_vacia(cargaEspera)) {
-         //   printf("SEGUNDO CICLO\n");
             procesarCargasEnEspera(pilasCargas, colasProcesos, cargaEspera, &tiempoParcial, procesosRealizados);
         }
 
@@ -69,8 +65,7 @@ int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos) {
         while (auxListaCargas != NULL) {
             nodo *auxRealizados = procesosRealizados->inicio;
             int repetido = 0;
-            
-            // Verificar si el proceso actual ya se ha realizado
+
             while (auxRealizados != NULL) {
                 if (auxListaCargas->posicion == auxRealizados->carga || tope(auxListaCargas->pilaDatos)->proceso == auxRealizados->proceso) {
                     repetido = 1;
@@ -89,8 +84,8 @@ int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos) {
             } else {
                 auxListaCargas = pilasCargas->inicio;
             }
-
         }
+
         printf("TOPE %i\n ", i);
         i++;
         printf("ASI VAN QUEDANDO PILAS\n");
@@ -101,11 +96,6 @@ int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos) {
         printf("TIEMPO FINAL NUEVO %i\n", tiempoFinal);
         tiempoParcial = 0;
     }
-    //tengo orden, pero no mismo tiempo
-    //POSIBLE ERROR ENCONTRADO: en el último tope, pasa que se puede procesar la carga 1 y después la carga 3 (3+1)
-    //al mismo tiempo que la carga 2 en el proceso 4 por el tiempo (4)
-    //y esto no lo implementé en ningún lado
-    //si el tiempo de procesamiento de la carga != es > a la suma del procesamiento de las cargas ==, se pueden procesar 2 cargas en un mismo proceso
     return tiempoFinal;
 }
 
@@ -178,12 +168,25 @@ int main(int argc, char *argv[]){
     }
 
     int tiempo = 0;
+    //calculo de tiempo
+    float tiempo_algoritmo = 0;
+	clock_t clock_ini, clock_fin;
+
+    clock_ini = clock();
+
     tiempo = procesarCargas(pilasCargas, colasProcesos);
     imprime_listaCola(colasProcesos);
     printf("TIEMPO AAAAAAA %i\n", tiempo);
+	
+	clock_fin = clock();
+	tiempo_algoritmo = (float)((clock_fin - clock_ini) / CLOCKS_PER_SEC);
+	
+	printf("\nTiempo del algoritmo en segundos: %.2f  \n", tiempo_algoritmo); 
+
 
     // Cerrar el archivo
     fclose(archivo);
+    //faltan free cola proceso, pilascargas
 
     // Imprimir los valores almacenados
     //printf("\nCantidad cargas: %d\n", cantidadCargas);

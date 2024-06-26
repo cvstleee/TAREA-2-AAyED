@@ -1,55 +1,198 @@
-//DEJO AQUI SOLO LO QUE FUNCIONE
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "TDAlista.h"
 #include "TDAlistaPila.h"
 #include "TDAlistaCola.h"
+#include "time.h"
 
-// Función para llenar la lista con los topes de las pilas
-//TDA usado: lista simple
-void llenarTopes(listaPila *pilasCargas, lista *topes, int cantidadCargas) {
-    nodoListaPila *aux = pilasCargas->inicio;
-    pila *pilaAux;;
-    // Vaciar la lista de topes actual
-    while (topes->inicio != NULL) {
-        elimina_inicio(topes);
+
+//---FUNCIONES PARA PROCESAR CARGAS---
+
+void procesarCargaEspecifica(nodoListaPila *auxListaCargas, listaCola *colasProcesos, int *tiempoParcial, lista *procesosRealizados, listaPila *pilasCargas) {
+    pila *pilaActual = auxListaCargas->pilaDatos;
+    int procesoActual = tope(pilaActual)->proceso;
+    int cargaActual = auxListaCargas->posicion;
+
+    if (*tiempoParcial < tope(pilaActual)->tiempo) {
+        *tiempoParcial = tope(pilaActual)->tiempo;
     }
-    // Llenar la lista con los nuevos topes de las pilas
-    for (int i = 0; i < cantidadCargas; i++) {
-        //tope me guarda n° de carga y su respectivo proceso
-        pilaAux = aux->pilaDatos;
-        inserta_inicio(topes, i + 1, tope(pilaAux)->proceso);
-        aux = aux -> siguiente;
+
+    nodoListaCola *auxListaProcesos = colasProcesos->inicio;
+    while (auxListaProcesos != NULL) {
+        if (auxListaProcesos->numeroProceso == procesoActual) {
+            encolar(auxListaProcesos->colaProceso, cargaActual);
+            desapilar(auxListaCargas->pilaDatos);
+            inserta_inicio(procesosRealizados, cargaActual, procesoActual);
+
+            if (es_pila_vacia(auxListaCargas->pilaDatos)) {
+                eliminarNodoListaPila(pilasCargas, auxListaCargas->posicion);
+                auxListaCargas = NULL;
+            }
+        }
+        auxListaProcesos = auxListaProcesos->siguiente;
     }
-    //printf("LISTA TOPES INICIALES (dentro funcion)\n");
-    //imprime_lista(topes);
 }
 
-//Función que verifica si hay procesos repetidos, con que uno se repita, queda uno en espera y ese entrega, en caso de no
-//existir, devuelve una lista nula
-//se usa TDA lista simple
-//devuelve una lista con la carga y el proceso a realizar después del primer desapilado
-lista * verificarProcesoRepetido(lista *topes, int cantidadCargas){
-    nodo *aux = topes->inicio;
-    nodo *sig = aux -> siguiente;
-    //int cargaIgual= 0;
-
-    lista *auxLista = nueva_lista();
-    //se recorre la lista de topes
-    while (aux != NULL) {
-        sig = aux->siguiente;
-        while (sig != NULL) {
-            if (aux ->proceso == sig->proceso) {
-                //FUNCIONA BIEN ESTO, aux tiene a la carga 2 y sig a la carga 1
-               printf("carga %i tiene el mismo proceso que la carga %i\n", aux->carga, sig->carga);
-               inserta_inicio(auxLista,aux->carga, aux->proceso); //me guarda el carga 2 
+void procesarCargasEnEspera(listaPila *pilasCargas, listaCola *colasProcesos, lista *cargaEspera, int *tiempoParcial, lista *procesosRealizados) {
+    nodo *auxEspera = cargaEspera->inicio;
+    while (auxEspera != NULL) {
+        nodoListaPila *auxListaCargas = pilasCargas->inicio;
+        while (auxListaCargas != NULL) {
+            if (auxListaCargas->posicion == auxEspera->carga) {
+                procesarCargaEspecifica(auxListaCargas, colasProcesos, tiempoParcial, procesosRealizados, pilasCargas);
             }
-            //que avance para terminar el ciclo
-            sig = sig->siguiente;
+            auxListaCargas = auxListaCargas->siguiente;
         }
-        //que avance para terminar el ciclo de los topes
-        aux = aux->siguiente;
+        elimina_inicio(cargaEspera);
+        auxEspera = cargaEspera->inicio;
     }
-    return auxLista;
+}
+
+int procesarCargas(listaPila *pilasCargas, listaCola *colasProcesos) {
+    int i = 1;
+    int tiempoParcial = 0;
+    int tiempoFinal = 0;
+    lista *cargaEspera = nueva_lista();
+
+    while (!es_listaPila_vacia(pilasCargas)) {
+        lista *procesosRealizados = nueva_lista();
+
+        if (!es_lista_vacia(cargaEspera)) {
+            procesarCargasEnEspera(pilasCargas, colasProcesos, cargaEspera, &tiempoParcial, procesosRealizados);
+        }
+
+        nodoListaPila *auxListaCargas = pilasCargas->inicio;
+        while (auxListaCargas != NULL) {
+            nodo *auxRealizados = procesosRealizados->inicio;
+            int repetido = 0;
+
+            while (auxRealizados != NULL) {
+                if (auxListaCargas->posicion == auxRealizados->carga || tope(auxListaCargas->pilaDatos)->proceso == auxRealizados->proceso) {
+                    repetido = 1;
+                }
+                auxRealizados = auxRealizados->siguiente;
+            }
+
+            if (!repetido) {
+                procesarCargaEspecifica(auxListaCargas, colasProcesos, &tiempoParcial, procesosRealizados, pilasCargas);
+            } else if (es_lista_vacia(cargaEspera)) {
+                inserta_inicio(cargaEspera, auxListaCargas->posicion, tope(auxListaCargas->pilaDatos)->proceso);
+            }
+
+            if (auxListaCargas != NULL) {
+                auxListaCargas = auxListaCargas->siguiente;
+            } else {
+                auxListaCargas = pilasCargas->inicio;
+            }
+        }
+
+        printf("TOPE %i\n ", i);
+        i++;
+        printf("ASI VAN QUEDANDO PILAS\n");
+        imprime_listaPila(pilasCargas);
+        printf("\n");
+        printf("TIEMPO PARCIAL ANTES DE GUARDARSE EN EL FINAL %i\n", tiempoParcial);
+        tiempoFinal += tiempoParcial;
+        printf("TIEMPO FINAL NUEVO %i\n", tiempoFinal);
+        tiempoParcial = 0;
+    }
+    return tiempoFinal;
+}
+
+
+
+
+int main(int argc, char *argv[]){
+    int cantidadCargas, cantidadProcesos;
+    int procesoCarga, tiempoProcesoCarga; //para la pila
+    listaCola *colasProcesos = nueva_listaCola();
+    listaPila *pilasCargas = nueva_listaPila();
+    pila *pilaAux = nueva_pila();
+    int i;
+
+    FILE *archivo;
+    // Abrir el archivo
+    archivo = fopen(argv[1], "r");
+    if (archivo == NULL) {
+        printf("Error al abrir el archivo.\n");
+        return 1;
+    }
+    //leer cantidad de cargas y procesos
+    fscanf(archivo, "%d %d", &cantidadCargas, &cantidadProcesos);
+
+    //leer procesos y tiempos según cargas y las guarda en pilas
+    int num1, num2;
+    int result1, result2;
+    int count = 0;
+    int j = 0;
+
+    char buffer[100]; // Buffer para leer líneas completas
+    nodoListaPila *aux = pilasCargas ->inicio;
+    int z;
+    int carga = 1;
+
+    //hay que invertir las pilas
+    while (fgets(buffer, sizeof(buffer), archivo) != NULL) {
+        char *linea = buffer;
+        int offset = 0;
+        int result;
+        //imprime_listaPila(pilasCargas);
+
+        //crea pilas según cantidad de procesos, se crea fuera, ya que se necesitan nuevas dsp de completar el for
+        pila *pilaAux = nueva_pila();
+        pila *pilaAuxInv = nueva_pila();
+
+        // Leer y procesar los pares de enteros en la línea
+        for (z = 0; z < cantidadProcesos; z++) {
+            //printf("z: %i\n", z); //z está avanzando bien
+            fscanf(archivo,"%d %d", &num1, &num2);
+            //printf("Proceso: %d, Tiempo: %d\n", num1, num2);
+            apilar(pilaAux, num1, num2);
+            //printf("apilado %i %i\n", num1, num2);
+            //printf("ASI VA LA PILA\n");
+            //imprime_pila(pilaAux);
+            linea += offset; // Avanzar en la línea
+        }
+        pilaAuxInv = invertirPila(pilaAux);
+        insertarPila(pilasCargas, carga, pilaAuxInv);
+        carga++;
+    }
+
+    printf("LISTA CON PILAS RESULTANTE:\n");
+    imprime_listaPila(pilasCargas);
+
+    //inicializar lista colas
+    for(i = 0; i < cantidadProcesos; i++){
+        cola *colaAux = crea_cola_vacia();
+        insertarCola(colasProcesos, i+1, colaAux);
+    }
+
+    int tiempo = 0;
+    //calculo de tiempo
+    float tiempo_algoritmo = 0;
+	clock_t clock_ini, clock_fin;
+
+    clock_ini = clock();
+
+    tiempo = procesarCargas(pilasCargas, colasProcesos);
+    imprime_listaCola(colasProcesos);
+    printf("TIEMPO AAAAAAA %i\n", tiempo);
+	
+	clock_fin = clock();
+	tiempo_algoritmo = (float)((clock_fin - clock_ini) / CLOCKS_PER_SEC);
+	
+	printf("\nTiempo del algoritmo en segundos: %.2f  \n", tiempo_algoritmo); 
+
+
+    // Cerrar el archivo
+    fclose(archivo);
+    //faltan free cola proceso, pilascargas
+
+    // Imprimir los valores almacenados
+    //printf("\nCantidad cargas: %d\n", cantidadCargas);
+    //printf("Cantidad procesos: %d\n", cantidadProcesos);
+    
+
+
+    return 0;
 }

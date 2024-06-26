@@ -21,8 +21,6 @@ int es_listaPila_vacia(listaPila *l){
     }
 
 
-//cambiarlo para que inserte al final, idea chatgpt:
-
 // Función para insertar un nodo al final de la lista de pilas
 //simula el insertar inicio y final
 void insertarPila(listaPila *l, int posicion, pila *p) {
