@@ -5,12 +5,10 @@
 #include "TDAlistaCola.h"
 #include "time.h"
 
-//Función que revisa si se puede asignar una carga a un proceso
-//Lo que en otras palabras significa que un proceso no tenga una carga procesandose, lo que significa que la lista de procesos actuales
-//está vacía
-//también revisa que otra carga no se esté procesando actualmente, ya que puede hacer un proceso a la vez
-//devuelve bool, pero realmente es int
-//debereía significar que hay procesosActuales vacíos, creo que no es tan necesario el pilasCargas
+
+//Dominio: lista x listaPila (con cargas a procesar)
+//Recorrido: int (valores 0 o 1)
+//Descripción: revisa si es que hay procesos sin utilizar, entrega un 0 en caso de que todos estén ocupados y un 1 cuando al menos 1 esé libre
 
 int sePuedeAsignar(lista *procesosActuales, listaPila *pilasCargas){
     nodo *auxProcesos = procesosActuales ->inicio;
@@ -19,11 +17,11 @@ int sePuedeAsignar(lista *procesosActuales, listaPila *pilasCargas){
         //si un proceso está vacío
         if(auxProcesos->carga == 0){
             //hay que buscar si alguna carga tiene ese proceso en el tope
-            printf("EXISTE PROCESO SIN CARGA ASIGNADA\n");
+            //printf("EXISTE PROCESO SIN CARGA ASIGNADA\n");
             nodoListaPila *auxListaCargas = pilasCargas->inicio;
             while(auxListaCargas != NULL){
                 if(tope(auxListaCargas->pilaDatos)->proceso == auxProcesos->proceso){
-                    printf("EXISTE CARGA CON PROCESO SIN CARGA ASIGNADA\n");
+                   // printf("EXISTE CARGA CON PROCESO SIN CARGA ASIGNADA\n");
                     return 1;
                 }
                 auxListaCargas = auxListaCargas->siguiente;
@@ -34,29 +32,32 @@ int sePuedeAsignar(lista *procesosActuales, listaPila *pilasCargas){
     return 0;
 }
 
-//Función que asigna cargas a procesos vacíos, las agrega a la lista de procesosActuales y a la cola de procesos realizados
+
+//Dominio: lista x listaPila (con cargas a procesar) x listaCola (procesos con cargas ya procesadas)
+//Recorrido: no tiene
+//Descripción: Asigna cargas a procesos vacíos en caso de que estás tengan ese proceso en el tope de sus pilas.
 
 void asignarCargas(lista *procesosActuales, listaPila *pilasCargas, listaCola *procesosRealizados){
     nodo *auxProcesos = procesosActuales->inicio;
 
     while(auxProcesos != NULL){
         //hay que buscar si alguna carga tiene ese proceso en el tope
-        printf("PROCESO ACTUAL %i\n", auxProcesos->proceso);
+        //printf("PROCESO ACTUAL %i\n", auxProcesos->proceso);
         nodoListaPila *auxListaCargas = pilasCargas->inicio;
         while(auxListaCargas != NULL){
-            printf("CARGA ACTUAL %i\n", auxListaCargas->posicion);
+            //printf("CARGA ACTUAL %i\n", auxListaCargas->posicion);
             if(tope(auxListaCargas->pilaDatos)->proceso == auxProcesos->proceso && auxProcesos -> carga == 0){
                 nodoListaCola *auxRealizados = procesosRealizados->inicio;
                 //ahora la carga del proceso con carga nula, será la posición del aux, ya que nos da el n° de la pila
                 auxProcesos->carga = auxListaCargas->posicion;
-                printf("COMO VA COLA DE PROCESOS ACTUALES\n");
-                imprime_lista(procesosActuales);
+                //printf("COMO VA COLA DE PROCESOS ACTUALES\n");
+                //imprime_lista(procesosActuales);
                 //y se guarda en procesosRealizados
                 while(auxRealizados != NULL){
                     if(auxRealizados->numeroProceso == auxProcesos->proceso){
                         encolar(auxRealizados->colaProceso, auxListaCargas->posicion);
-                        printf("COMO VA COLA DE PROCESOS REALIZADOS\n");
-                        imprime_listaCola(procesosRealizados);
+                       // printf("COMO VA COLA DE PROCESOS REALIZADOS\n");
+                       // imprime_listaCola(procesosRealizados);
                     }
                     auxRealizados = auxRealizados->siguiente;
                 }
@@ -65,13 +66,15 @@ void asignarCargas(lista *procesosActuales, listaPila *pilasCargas, listaCola *p
         }
         auxProcesos = auxProcesos->siguiente;
     }
-    printf("\nTERMINA DE ASIGNAR CARGAS\n");
+   // printf("\nTERMINA DE ASIGNAR CARGAS\n");
 }
 
 
-//según los procesos actuales, va desapilando en pilasCargas la carga que está siendo procesada hasta llegar a t = 0, avanza solo de 1 en 1 
-//restando en 1
-//en otra función, se irá aumentando el tiempo cada que esta se utilice
+//Dominio: lista x listaPila (con cargas a procesar)
+//Recorrido: no tiene
+//Descripción: encargada de controlar el procesamiento, resta en 1 el tiempo de las cargas que van siendo procesadas, desapila una carga si el proces asignado 
+//llega a un tiempo igual a 0, y elimina el nodo en la listaPila cuando la pila quede vacía
+
 void avanzarProcesamiento(lista *procesosActuales, listaPila *pilasCargas){
     nodo *auxProcesos = procesosActuales->inicio;
 
@@ -82,39 +85,37 @@ void avanzarProcesamiento(lista *procesosActuales, listaPila *pilasCargas){
             //busco la carga, ya que si un proceso tiene una carga asignada es pq se está realizando
             if(auxProcesos -> carga == auxCargas->posicion && tope(auxCargas->pilaDatos)->tiempo != 0){
                 int tiempoCargaActual = tope(auxCargas->pilaDatos)->tiempo;
-                printf("ESTA VIENDO EL TIEMPO DE LA CARGA %i\n", auxCargas->posicion);
-                printf("TIEMPO CARGA: %i\n", tiempoCargaActual);
+                //printf("ESTA VIENDO EL TIEMPO DE LA CARGA %i\n", auxCargas->posicion);
+                //printf("TIEMPO CARGA: %i\n", tiempoCargaActual);
                 tiempoCargaActual = tiempoCargaActual - 1;
-                printf("TIEMPO CARGA RESTADO: %i\n", tiempoCargaActual);
+                //printf("TIEMPO CARGA RESTADO: %i\n", tiempoCargaActual);
                 tope(auxCargas->pilaDatos)->tiempo = tiempoCargaActual;
-                printf("TIEMPO CARGA ACTUALIZADO: %i\n", tope(auxCargas->pilaDatos)->tiempo);
+                //printf("TIEMPO CARGA ACTUALIZADO: %i\n", tope(auxCargas->pilaDatos)->tiempo);
             }
             //si el tiempo es == 0, significa que el proceso terminó
             if(tope(auxCargas->pilaDatos)->tiempo == 0){
                 desapilar(auxCargas->pilaDatos);
                 auxProcesos -> carga = 0;
-                printf("LISTA PROCESOS ACTUALES DESPUES DE QUITAR UNA YA REALIZADA\n");
-                imprime_lista(procesosActuales);
+                //printf("LISTA PROCESOS ACTUALES DESPUES DE QUITAR UNA YA REALIZADA\n");
+                //imprime_lista(procesosActuales);
                 if (es_pila_vacia(auxCargas->pilaDatos)) {
-                    printf("ELIMINA PILA %i\n", auxCargas->posicion);
+                    //printf("ELIMINA PILA %i\n", auxCargas->posicion);
                     eliminarNodoListaPila(pilasCargas, auxCargas->posicion);
-                    //auxCargas = NULL;
                 }
             }
             auxCargas = auxCargas->siguiente;
         }
         auxProcesos = auxProcesos->siguiente;
-        printf("COMO VAN QUEDANDO PILAS\n");
-        imprime_listaPila(pilasCargas);
+       // printf("COMO VAN QUEDANDO PILAS\n");
+       // imprime_listaPila(pilasCargas);
     }
 }
 
-//PARA ELIMINAR PILAS VACÍAS DE LA LISTA
-/*if (es_pila_vacia(auxListaCargas->pilaDatos)) {
-                eliminarNodoListaPila(pilasCargas, auxListaCargas->posicion);
-                auxListaCargas = NULL;
-            }
-*/
+
+//Dominio: listaCola x listaPila (con cargas a procesar) x int
+//Recorrido: int (entrega el tiempo final)
+//Descripción: Inicializa el procesamiento de las cargas obtenidas, actúa según la función sePuedeAsignar y es la encargada de ir aumentando el tiempo en 1
+//cada vez que se avanza en el procesamiento
 
 int procesamientoCargas(listaCola *colasProcesos, listaPila *pilasCargas, int cantidadProcesos){
     //procesos actuales inicia vacío
@@ -123,27 +124,29 @@ int procesamientoCargas(listaCola *colasProcesos, listaPila *pilasCargas, int ca
     for(i = cantidadProcesos; i >= 1; i--){
         inserta_inicio(procesosActuales, 0, i);
     }
-    printf("PROCESOS ACTUALES\n");
-    imprime_lista(procesosActuales);
+    //printf("PROCESOS ACTUALES\n");
+    //imprime_lista(procesosActuales);
 
 
     int tiempo = 0;
 
     while(!es_listaPila_vacia(pilasCargas)){
         if(sePuedeAsignar(procesosActuales, pilasCargas)){
-           // printf("SALIO DEL LOOP RARO\n");
             asignarCargas(procesosActuales, pilasCargas, colasProcesos);
             avanzarProcesamiento(procesosActuales, pilasCargas);
             tiempo++;
-            printf("TIEMPO ACTUAL %i\n", tiempo);
+            //printf("TIEMPO ACTUAL %i\n", tiempo);
         }else{
             avanzarProcesamiento(procesosActuales, pilasCargas);
             tiempo++;
-            printf("TIEMPO ACTUAL %i\n", tiempo);
+            //printf("TIEMPO ACTUAL %i\n", tiempo);
         }
     }
+    libera_lista(procesosActuales);
     return tiempo;
 }
+
+
 
 int main(int argc, char *argv[]){
     int cantidadCargas, cantidadProcesos;
@@ -181,19 +184,14 @@ int main(int argc, char *argv[]){
         int result;
         //imprime_listaPila(pilasCargas);
 
-        //crea pilas según cantidad de procesos, se crea fuera, ya que se necesitan nuevas dsp de completar el for
+        //crea pilas según cantidad de procesos
         pila *pilaAux = nueva_pila();
         pila *pilaAuxInv = nueva_pila();
 
         // Leer y procesar los pares de enteros en la línea
         for (z = 0; z < cantidadProcesos; z++) {
-            //printf("z: %i\n", z); //z está avanzando bien
             fscanf(archivo,"%d %d", &num1, &num2);
-            //printf("Proceso: %d, Tiempo: %d\n", num1, num2);
             apilar(pilaAux, num1, num2);
-            //printf("apilado %i %i\n", num1, num2);
-            //printf("ASI VA LA PILA\n");
-            //imprime_pila(pilaAux);
             linea += offset; // Avanzar en la línea
         }
         pilaAuxInv = invertirPila(pilaAux);
@@ -201,8 +199,8 @@ int main(int argc, char *argv[]){
         carga++;
     }
 
-    printf("LISTA CON PILAS RESULTANTE:\n");
-    imprime_listaPila(pilasCargas);
+    //printf("LISTA CON PILAS RESULTANTE:\n");
+    //imprime_listaPila(pilasCargas);
 
     //inicializar lista colas
     for(i = 0; i < cantidadProcesos; i++){
@@ -212,24 +210,25 @@ int main(int argc, char *argv[]){
 
     int tiempo;
     //calculo de tiempo
-    //float tiempo_algoritmo = 0;
-	//clock_t clock_ini, clock_fin;
+    float tiempo_algoritmo = 0;
+	clock_t clock_ini, clock_fin;
 
-    //clock_ini = clock();
+    clock_ini = clock();
 
     tiempo = procesamientoCargas(colasProcesos, pilasCargas, cantidadProcesos);
-    imprime_listaCola(colasProcesos);
-    printf("TIEMPO AAAAAAA %i\n", tiempo);
+    //imprime_listaCola(colasProcesos);
+    printf("TIEMPO FINAL %i\n", tiempo);
 	
-	//clock_fin = clock();
-	//tiempo_algoritmo = (float)((clock_fin - clock_ini) / CLOCKS_PER_SEC);
+	clock_fin = clock();
+	tiempo_algoritmo = (float)((clock_fin - clock_ini) / CLOCKS_PER_SEC);
 	
-	//printf("\nTiempo del algoritmo en segundos: %.2f  \n", tiempo_algoritmo); 
+	printf("\nTiempo del algoritmo en segundos: %.2f  \n", tiempo_algoritmo); 
 
 
     // Cerrar el archivo
     fclose(archivo);
-    //faltan free cola proceso, pilascargas
+    libera_listaCola(colasProcesos);
+    libera_listaPila(pilasCargas);
 
     // Imprimir los valores almacenados
     //printf("\nCantidad cargas: %d\n", cantidadCargas);
