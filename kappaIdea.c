@@ -82,21 +82,30 @@ void avanzarProcesamiento(lista *procesosActuales, listaPila *pilasCargas){
             //busco la carga, ya que si un proceso tiene una carga asignada es pq se está realizando
             if(auxProcesos -> carga == auxCargas->posicion && tope(auxCargas->pilaDatos)->tiempo != 0){
                 int tiempoCargaActual = tope(auxCargas->pilaDatos)->tiempo;
+                printf("ESTA VIENDO EL TIEMPO DE LA CARGA %i\n", auxCargas->posicion);
+                printf("TIEMPO CARGA: %i\n", tiempoCargaActual);
                 tiempoCargaActual = tiempoCargaActual - 1;
+                printf("TIEMPO CARGA RESTADO: %i\n", tiempoCargaActual);
                 tope(auxCargas->pilaDatos)->tiempo = tiempoCargaActual;
+                printf("TIEMPO CARGA ACTUALIZADO: %i\n", tope(auxCargas->pilaDatos)->tiempo);
             }
             //si el tiempo es == 0, significa que el proceso terminó
             if(tope(auxCargas->pilaDatos)->tiempo == 0){
                 desapilar(auxCargas->pilaDatos);
-                auxProcesos -> carga == 0;
+                auxProcesos -> carga = 0;
+                printf("LISTA PROCESOS ACTUALES DESPUES DE QUITAR UNA YA REALIZADA\n");
+                imprime_lista(procesosActuales);
                 if (es_pila_vacia(auxCargas->pilaDatos)) {
+                    printf("ELIMINA PILA %i\n", auxCargas->posicion);
                     eliminarNodoListaPila(pilasCargas, auxCargas->posicion);
-                    auxCargas = NULL;
+                    //auxCargas = NULL;
                 }
             }
             auxCargas = auxCargas->siguiente;
         }
         auxProcesos = auxProcesos->siguiente;
+        printf("COMO VAN QUEDANDO PILAS\n");
+        imprime_listaPila(pilasCargas);
     }
 }
 
@@ -122,7 +131,7 @@ int procesamientoCargas(listaCola *colasProcesos, listaPila *pilasCargas, int ca
 
     while(!es_listaPila_vacia(pilasCargas)){
         if(sePuedeAsignar(procesosActuales, pilasCargas)){
-            printf("SALIO DEL LOOP RARO\n");
+           // printf("SALIO DEL LOOP RARO\n");
             asignarCargas(procesosActuales, pilasCargas, colasProcesos);
             avanzarProcesamiento(procesosActuales, pilasCargas);
             tiempo++;
