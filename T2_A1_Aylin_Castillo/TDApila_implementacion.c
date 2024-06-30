@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "TDApila.h"
+
+
+pila* nueva_pila(void){
+    pila *p = (pila*)malloc(sizeof(pila));
+	p->size = 0;
+	p->tope = NULL;
+	return p;
+    }
+
+
+int es_pila_vacia(pila *p){
+	if(p->size == 0){
+		return 1;
+	    }
+	else{
+		return 0;
+	    }
+    }
+    
+    
+void apilar(pila *p, int pro, int tie){
+	nodoPila* aux=(nodoPila*)malloc(sizeof(nodoPila));
+	aux -> proceso = pro;
+	aux -> tiempo = tie;
+	aux -> siguiente = p -> tope;
+	p -> tope = aux;
+	p -> size = p -> size + 1;
+}
+
+nodoPila *tope(pila *p){
+	return p -> tope;
+}
+
+void desapilar(pila *p){
+	nodoPila* aux=(nodoPila*)malloc(sizeof(nodoPila));
+	aux = p -> tope;
+	p -> tope = p -> tope -> siguiente;
+	p -> size = p -> size - 1;
+	free(aux);
+}
+
+
+void imprime_pila(pila *p){
+	pila *aux_pila;
+	aux_pila = nueva_pila();
+	nodoPila* aux;
+	aux = p -> tope;
+	
+	if(es_pila_vacia(p)){
+		printf("la pila esta vacia\n");
+	}else{
+		while(!es_pila_vacia(p)){
+		printf("proceso: %i tiempo: %i\n", aux -> proceso, aux -> tiempo);
+		apilar(aux_pila, aux -> proceso, aux -> tiempo);
+		desapilar(p);
+		aux = p -> tope;
+	 	}
+	 
+		aux = aux_pila -> tope; 
+		while(!es_pila_vacia(aux_pila)){
+			apilar(p, aux -> proceso, aux -> tiempo);
+			desapilar(aux_pila);
+			aux = aux_pila -> tope;
+		}
+
+	}
+}
+
+pila * invertirPila(pila *p){
+	pila* pilaAuxiliar = nueva_pila();
+    while (!es_pila_vacia(p)) {
+        apilar(pilaAuxiliar, tope(p)->proceso, tope(p)->tiempo);
+		desapilar(p);
+    }
+    return(pilaAuxiliar);
+}
